@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CircoLife · Service Operations Blueprint (Mumbai) · Draft v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2E1F40; --ink2:#4A3A5C; --muted:#6F6180; --line:#EADFE6; --line2:#F3ECF0;
+  --purple:#A14996; --purple-d:#7D3374; --purple-l:#F5E6F3; --purple-m:#E3C3DE;
+  --blue:#BDE0ED; --blue-d:#246F8E; --blue-l:#EAF5FA;
+  --green:#D0F0C0; --green-d:#2F6B2E; --green-l:#EEF9E8;
+  --canvas:#FEF9F5; --card:#FFFFFF;
+  --p0:#B42318; --p0-l:#FDECEA; --p1:#9A5B00; --p1-l:#FFF3DC; --p2:#246F8E; --p2-l:#EAF5FA;
+  --amber:#E7A33C;
+  --hero:linear-gradient(115deg,#EBD6F0 0%,#D5ECF6 52%,#E1F5D6 100%);
+  --r-lg:18px; --r-md:12px; --r-sm:8px;
+  --font:'Nunito',ui-rounded,'SF Pro Rounded','Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--font);background:var(--canvas);color:var(--ink);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--purple-d);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:inherit}
+:focus-visible{outline:3px solid var(--purple);outline-offset:2px;border-radius:6px}
+h1,h2,h3,h4{margin:0;line-height:1.2}
+h1{font-size:28px;font-weight:900;letter-spacing:-.01em}
+h2{font-size:21px;font-weight:800}
+h3{font-size:16.5px;font-weight:800}
+h4{font-size:14px;font-weight:800}
+p{margin:.4em 0}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.tiny{font-size:12px}
+.num{font-variant-numeric:tabular-nums}
+
+/* Shell */
+.app{display:grid;grid-template-columns:236px 1fr;min-height:100vh}
+.side{background:var(--ink);color:#EFE7F4;position:sticky;top:0;height:100vh;overflow:auto;padding:22px 14px 18px;display:flex;flex-direction:column;gap:14px}
+.logo{font-weight:900;font-size:27px;letter-spacing:-.02em;color:#fff;display:flex;align-items:center;gap:2px;padding:0 8px}
+.logo .inf{color:#D98BCF;font-size:30px;margin-left:3px;transform:translateY(-1px)}
+.tag{font-size:10.5px;letter-spacing:.14em;color:#BFAFCD;padding:0 8px;margin-top:-8px}
+.nav{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.nav a{display:flex;align-items:center;gap:10px;color:#E6DCEE;padding:9px 12px;border-radius:999px;font-weight:700;font-size:14px}
+.nav a:hover{background:rgba(255,255,255,.07);text-decoration:none}
+.nav a.on{background:#fff;color:var(--ink)}
+.nav a .ix{width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;font-size:11px;background:rgba(255,255,255,.1);font-weight:800}
+.nav a.on .ix{background:var(--purple);color:#fff}
+.side .foot{margin-top:auto;font-size:12px;color:#BFAFCD;padding:0 8px}
+.scen{background:rgba(255,255,255,.06);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.scen .lbl{font-size:12px;color:#CDBEDA;font-weight:700}
+.seg{display:flex;background:rgba(0,0,0,.25);border-radius:999px;padding:3px}
+.seg button{flex:1;border:0;background:transparent;color:#E6DCEE;padding:6px 8px;border-radius:999px;font-weight:800;font-size:12px;cursor:pointer}
+.seg button.on{background:var(--purple);color:#fff}
+
+.main{min-width:0}
+.top{position:sticky;top:0;z-index:20;background:rgba(254,249,245,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:12px 28px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.crumbs{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.crumbs a{color:var(--muted);font-weight:700}
+.crumbs .sep{opacity:.5}
+.navbtns{display:flex;gap:6px}
+.pillbtn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:7px 14px;font-weight:800;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.pillbtn:hover{border-color:var(--purple-m)}
+.pillbtn.primary{background:var(--purple);border-color:var(--purple);color:#fff}
+.pillbtn.primary:hover{background:var(--purple-d)}
+.pillbtn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pillbtn.sm{padding:4px 10px;font-size:12px}
+.search{margin-left:auto;position:relative}
+.search input{width:300px;max-width:52vw;border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 16px;font:inherit;font-size:14px;color:var(--ink)}
+.search input:focus{outline:none;border-color:var(--purple)}
+.sres{position:absolute;right:0;top:44px;width:420px;max-width:90vw;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 40px -18px rgba(46,31,64,.35);max-height:60vh;overflow:auto;display:none;z-index:40}
+.sres a{display:block;padding:9px 14px;border-bottom:1px solid var(--line2);color:var(--ink)}
+.sres a:hover{background:var(--purple-l);text-decoration:none}
+.sres .k{font-size:11px;color:var(--muted);font-weight:800}
+
+.page{padding:26px 28px 60px;max-width:1360px}
+.phead{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.phead .sub{color:var(--muted);max-width:760px}
+
+/* Panels */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 20px}
+.panel + .panel{margin-top:16px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.mt{margin-top:16px}.mt2{margin-top:26px}.mb{margin-bottom:12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sechead{display:flex;align-items:baseline;gap:12px;margin:26px 0 10px;flex-wrap:wrap}
+.sechead .note{color:var(--muted);font-size:13px}
+
+/* Chips */
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px 3px 4px;font-size:12.5px;font-weight:800;background:#fff;border:1px solid var(--line);color:var(--ink);cursor:pointer;white-space:nowrap;line-height:1.5}
+.chip:hover{border-color:var(--purple);text-decoration:none}
+.chip .av{width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;font-size:10px;color:#fff;background:var(--ink2)}
+.chip.vac{border-style:dashed;color:var(--p0)}
+.chip.vac .av{background:var(--p0)}
+.chip.team .av{border-radius:6px}
+.tagx{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:800;white-space:nowrap}
+.t-bd{background:var(--purple-l);color:var(--purple-d)}
+.t-pm{background:var(--blue-l);color:var(--blue-d)}
+.t-both{background:#F1ECF5;color:var(--ink2)}
+.t-ok{background:var(--green-l);color:var(--green-d)}
+.t-p0{background:var(--p0-l);color:var(--p0)}
+.t-p1{background:var(--p1-l);color:var(--p1)}
+.t-p2{background:var(--p2-l);color:var(--p2)}
+.t-grey{background:#F2EEF3;color:var(--muted)}
+.t-sla{background:#FFF7E6;color:#8A5300;border:1px solid #F6DDAA}
+
+/* Hero */
+.hero{background:var(--hero);border-radius:24px;padding:26px 28px;position:relative;overflow:hidden}
+.hero h1{font-size:34px}
+.hero .lede{max-width:760px;font-size:16px;color:var(--ink2);margin-top:8px}
+.now{margin-top:20px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:stretch}
+.clock{background:var(--ink);color:#fff;border-radius:18px;padding:16px 20px;min-width:210px}
+.clock .t{font-size:40px;font-weight:900;letter-spacing:-.02em;line-height:1}
+.clock .d{color:#D6C7E2;font-weight:700;margin-top:6px}
+.clock .w{margin-top:10px;font-size:12.5px;font-weight:800;border-radius:999px;display:inline-block;padding:3px 10px}
+.nowgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.nowcard{background:rgba(255,255,255,.72);border-radius:16px;padding:12px 14px;border:1px solid rgba(255,255,255,.9)}
+.nowcard h4{font-size:12.5px;color:var(--muted);font-weight:800;margin-bottom:6px}
+.nowcard .chips{display:flex;flex-wrap:wrap;gap:5px}
+
+/* Stats */
+.stat{padding:14px 16px;border-radius:14px;background:#fff;border:1px solid var(--line)}
+.stat .v{font-size:28px;font-weight:900;letter-spacing:-.02em}
+.stat .l{font-size:13px;color:var(--muted);font-weight:700}
+.stat.bad{background:var(--p0-l);border-color:#F6C9C3}.stat.bad .v{color:var(--p0)}
+.stat.warn{background:var(--p1-l);border-color:#F3D9A6}.stat.warn .v{color:var(--p1)}
+.stat.good{background:var(--green-l);border-color:#CFEAC2}.stat.good .v{color:var(--green-d)}
+
+/* Tables */
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
+table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{text-align:left;font-size:12px;color:var(--muted);font-weight:800;background:#FBF6F9;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--line2);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tr.click{cursor:pointer}
+.tbl tr.click:hover td{background:#FCF5FA}
+.tbl td.wrap{min-width:200px}
+
+/* Workflow map */
+.flowtools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.flowtools input{border:1px solid var(--line);border-radius:999px;padding:7px 14px;font:inherit;font-size:13.5px;min-width:220px;background:#fff}
+.stage{border:1px solid var(--line);border-radius:var(--r-lg);background:#fff;margin-bottom:0;overflow:hidden}
+.stage > header{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;user-select:none}
+.stage > header .lane{font-size:12px;font-weight:800;color:var(--muted)}
+.stage > header .tog{margin-left:auto;font-weight:900;color:var(--muted);transition:transform .2s}
+.stage.closed > header .tog{transform:rotate(-90deg)}
+.stage.closed .stagebody{display:none}
+.stagebody{padding:4px 16px 16px;display:flex;align-items:stretch;gap:0;flex-wrap:wrap;row-gap:12px}
+.bd .stage{border-left:6px solid var(--purple)}
+.pm .stage{border-left:6px solid var(--blue-d)}
+.stage .sno{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:13px;color:#fff}
+.bd .stage .sno{background:var(--purple)}
+.pm .stage .sno{background:var(--blue-d)}
+.node{width:196px;min-height:118px;border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;background:#fff;cursor:pointer;display:flex;flex-direction:column;gap:6px;position:relative;transition:border-color .15s, box-shadow .15s}
+.node:hover{border-color:var(--purple);box-shadow:0 8px 20px -14px rgba(161,73,150,.6)}
+.pm .node:hover{border-color:var(--blue-d);box-shadow:0 8px 20px -14px rgba(36,111,142,.6)}
+.node .top1{display:flex;align-items:center;gap:6px}
+.node .stp{font-weight:900;font-size:12px;border-radius:999px;padding:1px 8px}
+.bd .node .stp{background:var(--purple-l);color:var(--purple-d)}
+.pm .node .stp{background:var(--blue-l);color:var(--blue-d)}
+.node .act{font-weight:800;font-size:13.5px;line-height:1.3}
+.node .own{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto}
+.node .own .chip{font-size:11.5px;padding:1px 8px 1px 3px}
+.node .own .chip .av{width:16px;height:16px;font-size:9px}
+.node .flag{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;background:var(--p0);color:#fff;font-size:11px;font-weight:900;display:grid;place-items:center}
+.node .flag.p1{background:var(--amber)}
+.node.dim{opacity:.22}
+.node.hit{outline:3px solid var(--amber)}
+.node.decision{background:#FFFBF2;border-style:dashed;border-color:#E9C98B}
+.node.term{background:var(--green-l);border-color:#BFE3AE;min-height:70px}
+.arrow{width:26px;display:flex;align-items:center;justify-content:center;color:#C9B6C4;font-weight:900;font-size:18px}
+.vlink{display:flex;justify-content:center;padding:6px 0;color:#C9B6C4;font-size:18px;font-weight:900}
+.branches{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%}
+.branch{border:1px dashed var(--line);border-radius:14px;padding:10px;background:#FFFCFB}
+.branch h4{font-size:12.5px;color:var(--muted);margin-bottom:8px}
+.branch .chain{display:flex;flex-wrap:wrap;row-gap:10px;align-items:stretch}
+.subs{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;width:100%;margin-top:4px}
+.subs div{border:1px solid var(--line);border-radius:10px;padding:6px 8px;font-size:12px;background:#FBFDFE}
+.subs b{display:block;font-size:11px;color:var(--blue-d)}
+
+/* Drawer */
+.drawer{position:fixed;top:0;right:0;height:100vh;width:480px;max-width:94vw;background:#fff;border-left:1px solid var(--line);box-shadow:-24px 0 50px -30px rgba(46,31,64,.45);transform:translateX(105%);transition:transform .25s ease;z-index:60;display:flex;flex-direction:column}
+.drawer.open{transform:none}
+.drawer header{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:flex-start}
+.drawer .body{padding:16px 20px 30px;overflow:auto}
+.drawer dl{display:grid;grid-template-columns:118px 1fr;gap:9px 12px;margin:0;font-size:13.5px}
+.drawer dt{color:var(--muted);font-weight:800;font-size:12.5px}
+.drawer dd{margin:0}
+.scrim{position:fixed;inset:0;background:rgba(46,31,64,.18);z-index:55;display:none}
+.scrim.open{display:block}
+.xbtn{margin-left:auto;border:0;background:#F4EEF3;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:16px;font-weight:900;color:var(--ink)}
+
+/* Issues */
+.issue{border-radius:14px;padding:12px 14px;border:1px solid var(--line);background:#fff;display:grid;grid-template-columns:auto 1fr;gap:4px 12px}
+.issue + .issue{margin-top:10px}
+.issue .pr{grid-row:span 3;font-weight:900;border-radius:10px;padding:4px 8px;height:fit-content;font-size:12.5px}
+.issue.p0{border-color:#F4C7C1;background:#FFF8F7}.issue.p0 .pr{background:var(--p0);color:#fff}
+.issue.p1{border-color:#F1DDB3;background:#FFFCF5}.issue.p1 .pr{background:var(--amber);color:#fff}
+.issue.p2 .pr{background:var(--blue-l);color:var(--blue-d)}
+.issue h4{font-size:14.5px}
+.issue .q{font-weight:800;color:var(--ink);margin-top:4px}
+
+/* Roster */
+.matrix td.cell{text-align:center;font-weight:900;font-size:12px;padding:6px}
+.sc{display:inline-block;min-width:34px;border-radius:8px;padding:3px 6px}
+.sc.A{background:#F5E6F3;color:var(--purple-d)}
+.sc.B{background:var(--blue-l);color:var(--blue-d)}
+.sc.G{background:#F1EFE0;color:#5E5A2E}
+.sc.X{background:#F4F0F2;color:#A898A6}
+.heat{display:grid;grid-template-columns:52px repeat(24,minmax(0,1fr));gap:2px;font-size:10.5px}
+.heat .hl{font-weight:800;color:var(--muted);display:flex;align-items:center}
+.heat .hc{height:22px;border-radius:4px;display:grid;place-items:center;font-weight:800;font-size:10.5px}
+.heat .hh{color:var(--muted);text-align:left;font-weight:700;font-size:10px}
+.c0{background:#F7D3CF;color:var(--p0)}
+.cbrk{background:#FBE7C4;color:var(--p1)}
+.c1{background:#E3F3DA;color:var(--green-d)}
+.c2{background:#C9E9B8;color:var(--green-d)}
+.c3{background:#A9DA92;color:#1F4F1E}
+.gantt{position:relative;border:1px solid var(--line);border-radius:14px;background:#fff;overflow-x:auto}
+.gantt .gin{min-width:900px}
+.grow{display:grid;grid-template-columns:170px 1fr;border-bottom:1px solid var(--line2);min-height:38px}
+.grow:last-child{border-bottom:0}
+.grow .gn{padding:8px 12px;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;border-right:1px solid var(--line2);background:#FFFCFA}
+.gtrack{position:relative}
+.gtrack .gl{position:absolute;top:0;bottom:0;width:1px;background:var(--line2)}
+.gbar{position:absolute;top:6px;bottom:6px;border-radius:7px;font-size:11px;font-weight:800;padding:3px 6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:default}
+.nowline{position:absolute;top:0;bottom:0;width:2px;background:var(--p0);z-index:3}
+.nowline::after{content:'now';position:absolute;top:-2px;left:4px;font-size:10px;color:var(--p0);font-weight:900}
+.ghead{display:grid;grid-template-columns:170px 1fr;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted);font-weight:800}
+.ghead .gt{position:relative;height:26px}
+.ghead .gt span{position:absolute;top:6px;transform:translateX(-50%)}
+
+/* Calendar */
+.cal{display:grid;grid-template-columns:54px repeat(7,minmax(0,1fr));border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.cal.one{grid-template-columns:54px 1fr}
+.cal .ch{background:#FBF6F9;padding:8px;font-weight:900;font-size:12.5px;text-align:center;border-bottom:1px solid var(--line);border-left:1px solid var(--line2)}
+.cal .ch small{display:block;font-weight:700;color:var(--muted);font-size:11px}
+.cal .tcol{position:relative;border-right:1px solid var(--line2)}
+.cal .tcol span{position:absolute;right:6px;font-size:10.5px;color:var(--muted);font-weight:700;transform:translateY(-50%)}
+.cal .dcol{position:relative;border-left:1px solid var(--line2)}
+.cal .hline{position:absolute;left:0;right:0;height:1px;background:var(--line2)}
+.cb{position:absolute;left:3px;right:3px;border-radius:7px;padding:3px 6px;font-size:11px;font-weight:700;line-height:1.25;overflow:hidden;border-left:3px solid transparent}
+.k-work{background:#F8F2F7;border-left-color:var(--purple-m);color:var(--ink2)}
+.k-pmwork{background:var(--blue-l);border-left-color:#8CC6DC;color:#1E4E63}
+.k-mgmt,.k-bd{background:var(--purple-l);border-left-color:var(--purple);color:var(--purple-d)}
+.k-pm{background:#DDEFF6;border-left-color:var(--blue-d);color:var(--blue-d)}
+.k-esc{background:var(--p0-l);border-left-color:var(--p0);color:var(--p0)}
+.k-meeting{background:#EFE9F6;border-left-color:#8D72A8;color:#4C3968}
+.k-handover{background:#FFF3DC;border-left-color:var(--amber);color:#7A4A00}
+.k-break{background:repeating-linear-gradient(45deg,#F7F4F2,#F7F4F2 6px,#FFFFFF 6px,#FFFFFF 12px);color:#9A8F97;border-left-color:#D9CFD4}
+.k-report{background:var(--green-l);border-left-color:#8CCB76;color:var(--green-d)}
+.k-flex{background:#F3F0DE;border-left-color:#B8AE55;color:#57511C}
+.offday{position:absolute;inset:6px;border-radius:10px;border:1.5px dashed #D9CFD4;display:grid;place-items:center;text-align:center;color:var(--muted);font-weight:800;font-size:12px;padding:6px;background:#FCFAFA}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:12.5px;color:var(--muted);font-weight:700}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:5px}
+
+/* Bars */
+.bar{height:12px;border-radius:999px;background:#F2ECF0;position:relative;overflow:hidden}
+.bar > span{position:absolute;left:0;top:0;bottom:0;border-radius:999px}
+.bar .cap{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink)}
+.u-ok{background:#7CC36A}.u-near{background:var(--amber)}.u-over{background:var(--p0)}.u-none{background:#C9BFC6}
+
+/* Cards */
+.navcard{display:block;border:1px solid var(--line);border-radius:18px;background:#fff;padding:16px;color:var(--ink);transition:border-color .15s}
+.navcard:hover{border-color:var(--purple);text-decoration:none}
+.navcard .n{font-weight:900;font-size:15.5px}
+.navcard p{color:var(--muted);font-size:13px;margin:.3em 0 0}
+.pcard{border:1px solid var(--line);border-radius:16px;background:#fff;padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:8px}
+.pcard:hover{border-color:var(--purple)}
+.pcard .nm{font-weight:900;font-size:16px;display:flex;align-items:center;gap:8px}
+.bigav{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:900;font-size:15px;flex:none}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;font-size:14px}
+.kv dt{color:var(--muted);font-weight:800;font-size:13px}
+.kv dd{margin:0}
+ul.clean{margin:.3em 0;padding-left:18px}
+ul.clean li{margin:.25em 0}
+.steplink{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:2px 10px 2px 3px;font-size:12.5px;font-weight:800;margin:2px 4px 2px 0;color:var(--ink);background:#fff}
+.steplink b{border-radius:999px;padding:0 7px;font-size:11.5px}
+.steplink.bd b{background:var(--purple-l);color:var(--purple-d)}
+.steplink.pm b{background:var(--blue-l);color:var(--blue-d)}
+.steplink:hover{border-color:var(--purple);text-decoration:none}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.inputs{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.inputs label{display:flex;flex-direction:column;font-size:12.5px;font-weight:800;color:var(--muted);gap:4px}
+.inputs input,.inputs select, select.sel{border:1px solid var(--line);border-radius:10px;padding:7px 10px;font:inherit;font-size:14px;color:var(--ink);background:#fff}
+.minin{width:58px;border:1px solid var(--line);border-radius:8px;padding:3px 6px;font:inherit;font-size:13px;text-align:right}
+.banner{border-radius:14px;padding:12px 16px;font-weight:700;font-size:13.5px}
+.banner.draft{background:var(--p1-l);color:#6B4200;border:1px solid #F1D9A8}
+.banner.synth{background:#FFF0F6;color:#8A1D55;border:1px dashed #E7A6C6}
+.banner.info{background:var(--blue-l);color:#1E4E63;border:1px solid #CBE6F1}
+.two{display:grid;grid-template-columns:1.25fr 1fr;gap:16px}
+.phase{border-left:4px solid var(--purple);padding:4px 0 4px 14px;margin:12px 0}
+.phase:nth-child(even){border-left-color:var(--blue-d)}
+.hbar{display:flex;height:34px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.hbar div{display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden}
+.empty{border:1.5px dashed var(--line);border-radius:14px;padding:22px;text-align:center;color:var(--muted);font-weight:700}
+.kbd{font-size:11px;border:1px solid var(--line);border-radius:5px;padding:0 5px;background:#fff}
+
+@media (max-width:1100px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(2,minmax(0,1fr))}.nowgrid{grid-template-columns:1fr 1fr}.branches{grid-template-columns:1fr}.two{grid-template-columns:1fr}}
+@media (max-width:820px){.app{grid-template-columns:1fr}.side{position:relative;height:auto}.nav{flex-direction:row;flex-wrap:wrap}.g2,.g3,.g4{grid-template-columns:1fr}.now{grid-template-columns:1fr}.page{padding:18px 14px 50px}.top{padding:10px 14px}.search input{width:100%}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  .side,.top,.drawer,.scrim,.flowtools,.noprint{display:none!important}
+  .app{display:block}
+  body{background:#fff;font-size:12px}
+  .page{padding:0;max-width:none}
+  .panel,.stage,.tblwrap,.node{break-inside:avoid}
+  .stage.closed .stagebody{display:flex}
+  .hero{background:#fff;border:1px solid #ccc}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" aria-label="Main navigation">
+    <div class="logo">circolife<span class="inf">∞</span></div>
+    <div class="tag">INTELLIGENT•IMPACT•EVERYDAY</div>
+    <nav class="nav" id="nav"></nav>
+    <div class="scen">
+      <div class="lbl">Headcount scenario</div>
+      <div class="seg" role="group" aria-label="Headcount scenario">
+        <button id="scA" onclick="setScen('A')" title="Only people named in Workflow_Improved.xlsx">Workbook</button>
+        <button id="scB" onclick="setScen('B')" title="Adds Mumbai org-chart names not in the workbook: Vishal, Imran, Rahul; Siddesh as PM DEO">+ Org chart</button>
+      </div>
+      <div class="tiny" id="scenNote" style="color:#CDBEDA"></div>
+    </div>
+    <div class="foot">Mumbai service operations · Draft v1 · Source: Workflow_Improved.xlsx<br>Procyon Star Pvt Ltd</div>
+  </aside>
+  <div class="main">
+    <div class="top">
+      <div class="navbtns noprint">
+        <button class="pillbtn" onclick="history.back()" title="Back" aria-label="Back">‹</button>
+        <button class="pillbtn" onclick="history.forward()" title="Forward" aria-label="Forward">›</button>
+        <button class="pillbtn primary" onclick="go('home')">Home</button>
+      </div>
+      <div class="crumbs" id="crumbs"></div>
+      <div class="search">
+        <input id="q" type="search" placeholder="Search steps, people, KPIs, FSM fields…  ( / )" autocomplete="off" aria-label="Search">
+        <div class="sres" id="sres"></div>
+      </div>
+    </div>
+    <main class="page" id="page"></main>
+  </div>
+</div>
+<div class="scrim" id="scrim" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer" aria-live="polite"><header id="dhead"></header><div class="body" id="dbody"></div></aside>
+<script>
+/* =========================================================
+   DATA LAYER — normalised from Workflow_Improved.xlsx
+   Everything marked src:'wb' is from the workbook.
+   src:'org' = Mumbai org chart (outside the workbook) — shown only in scenario B.
+   src:'asm' = design assumption made in this blueprint (to confirm).
+   ========================================================= */
+const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DAYSL=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const WIN={s:8,e:20}; // ASSUMPTION: 12-hour coverage window 08:00–20:00
+const SHIFTS={
+  A:{s:8,e:17,brk:[13,14],name:'Shift A',time:'08:00–17:00'},
+  B:{s:11,e:20,brk:[14,15],name:'Shift B',time:'11:00–20:00'},
+  G:{s:9.5,e:18.5,brk:[13.5,14.5],name:'General',time:'09:30–18:30'}
+};
+const TCA=['mrunal','vivek','rakhi','siddesh'], TCB=['mrunal','rahul','rakhi'];
+
+/* ---------- PEOPLE & ROLES ---------- */
+const PEOPLE=[
+ {id:'anil',name:'Anil',role:'Service Head (City)',grp:'Management',wf:'Both',src:'wb',reportsTo:null,color:'#2E1F40',
+  summary:'Accountable for the whole Mumbai service operation: BD and PM outcomes, escalations, quality, cost and team capability. Co-owns daily escalated/delayed call reviews with both ASMs and owns the weekly analysis reports.',
+  roster:{A:['G','A','G','B','G','G','X']}, backup:{A:'jp',B:'jp'}, backupNote:'On Sunday and outside 09:30–18:30, the on-duty ASM is escalation owner (JP for BD, Pradeep for PM). Service Head remains accountable for weekly KPIs.',
+  kpis:['BD SLA mix (T+1/T+2/T+4)','PM plan-vs-completion','Repeat issue rate','Cost per ticket','Quality failures & penalties'],
+  esc:'Final escalation point for BD and PM. Receives unresolved cases from JP (BD) and Pradeep (PM).'},
+ {id:'jp',name:'JP',full:'Jayprakash',role:'ASM – BD',grp:'Management',wf:'BD',src:'wb',reportsTo:'anil',color:'#7D3374',
+  summary:'Area Service Manager for Breakdown. Owns billable quotation and payment path (steps 15–16), executes escalated disagreement cases (step 24), and runs the BD daily reviews (Reports 1–3).',
+  roster:{A:['A','X','A','A','A','A','A']}, backup:{A:'pradeep',B:'pradeep'}, backupNote:'Tuesday (weekly off): Pradeep holds BD escalation authority; Anil runs BD operations review with Rakesh.',
+  kpis:['T+4 billable discussion closure','Quotation conversion','Escalation age','Spare dispatch timeliness','SC team T+1 / T+2 attainment'],
+  esc:'First escalation for BD Service Coordinators; escalates to Anil.'},
+ {id:'pradeep',name:'Pradeep',alias:'Pradip',role:'ASM – PM',grp:'Management',wf:'PM',src:'wb',reportsTo:'anil',color:'#246F8E',
+  summary:'Area Service Manager for Preventive Maintenance. Owns the monthly PM plan (with Anil/Anuja), PM closure verification (steps 15–16), vendor availability, utilisation and onboarding, and the PM daily/weekly reviews.',
+  roster:{A:['B','B','B','X','B','B','B']}, backup:{A:'jp',B:'jp'}, backupNote:'Thursday (weekly off): JP holds PM escalation authority; Anil runs PM operations review with the Technician Coordinators.',
+  kpis:['PM plan vs completion','PM overdue','PM closure pending','Machine-failure conversion','Vendor utilisation'],
+  esc:'First escalation for Technician Coordinators and PM machine-failure closure; escalates to Anil.'},
+ {id:'asm_new',name:'ASM (New)',role:'ASM – escalation (vacant)',grp:'Management',wf:'BD',src:'wb',reportsTo:'anil',vacant:true,color:'#B42318',
+  summary:'The workbook assigns BD step 23 (“If customer doesn’t agree, escalate to ASM”) to a person written as “New”. This is treated as an unfilled position. Until filled, JP is shown as interim owner.',
+  roster:{}, kpis:['Disagreement escalation resolution time'], esc:'Escalates to Anil.'},
+ {id:'rakesh',name:'Rakesh',role:'Service Coordinator 1 – BD',grp:'Coordination',wf:'BD',src:'wb',reportsTo:'jp',color:'#A14996',
+  summary:'Owns first-visit BD execution: appointment verification, rescheduling, technician supervision, RCA, W/O closure and ticket closure (steps 4–10). Administers 16 technicians (roster, attendance, leaves, expenses, uniform). Target: T+1 for 90% of tickets.',
+  roster:{A:['A','A','A','A','A','A','X'],B:['A','A','A','A','A','A','X']}, backup:{A:'shakeel',B:'vishal'},
+  kpis:['T+1 for 90% of BD tickets','Reschedule rate','RCA completeness','Ticket closure lag','Technician attendance (Report 10)'],
+  esc:'Escalates delayed / at-risk tickets to JP.'},
+ {id:'shakeel',name:'Shakeel',alias:'Shekeel',role:'Service Coordinator 2 – BD',grp:'Coordination',wf:'Both',src:'wb',reportsTo:'jp',color:'#A14996',
+  summary:'Owns BD follow-up visits: follow-up W/O, technician discussion, spare requirement, FoC zero invoice, appointment, supervision, RCA and closure (steps 11–14, 17–22). Also owns PM machine-failure follow-ups (PM 13–14). Administers 6+4 technicians. Target: T+2 for follow-up visit.',
+  roster:{A:['B','B','X','B','B','B','A'],B:['B','B','X','B','B','B','A']}, backup:{A:'rakesh',B:'vishal'},
+  kpis:['T+2 follow-up visit','Spare turnaround','FoC invoice accuracy','Machine-failure follow-up closure'],
+  esc:'Escalates follow-up delays to JP; machine-failure closures co-verified by Pradeep.'},
+ {id:'vishal',name:'Vishal',role:'Service Coordinator – BD (SC3 candidate)',grp:'Coordination',wf:'BD',src:'org',reportsTo:'jp',color:'#A14996',scen:['B'],
+  summary:'Not in the workbook. Named as a BD Service Coordinator in the Mumbai org chart. The workbook references an “SC3” with a T+4 target for billable discussions but names no one. Shown here as the SC3 candidate and roster floater — requires your confirmation.',
+  roster:{B:['B','B','B','X','B','B','B']}, backup:{B:'rakesh'},
+  kpis:['T+4 billable discussion (support to JP)','Cover-day T+1/T+2 attainment'], esc:'Escalates to JP.'},
+ {id:'imran',name:'Imran',role:'Service Coordinator – PM',grp:'Coordination',wf:'PM',src:'org',reportsTo:'pradeep',color:'#246F8E',scen:['B'],
+  summary:'Not in the workbook. Named as PM Service Coordinator in the Mumbai org chart. No workbook activity is assigned — a decision is needed (see P1-7: candidate owner for PM machine-failure follow-ups instead of BD SC2).',
+  roster:{B:['G','G','G','G','X','G','G']}, kpis:['To be defined'], esc:'Escalates to Pradeep.'},
+ {id:'karan',name:'Karan',role:'Data Entry Operator – BD',grp:'Intake',wf:'BD',src:'wb',reportsTo:'jp',color:'#6F6180',
+  summary:'Co-owner with CC of BD step 3: converting the ticket into Request → W/O → Appointment in Zoho FSM.',
+  roster:{A:['G','G','G','G','G','G','X'],B:['G','G','G','G','G','G','X']}, backup:{A:'cc',B:'siddesh'},
+  kpis:['Ticket-to-appointment creation time','Data completeness (asset MAC, slot, contact)'], esc:'Escalates data blocks to Rakesh.'},
+ {id:'cc',name:'Contact Centre',role:'Contact Centre (CC) team',grp:'Intake',wf:'Both',src:'wb',team:true,reportsTo:null,color:'#6F6180',
+  summary:'Entry point for both workflows. BD: ticket raise, time-slot confirmation, request/W/O/appointment creation with DEO (steps 1–3). PM: customer time-slot confirmation, request raise (marked “Eliminate”), W/O creation and appointment dispatch with Technician Coordinators (steps 2–5). Headcount and reporting line are not in the workbook.',
+  roster:{}, kpis:['Answer / callback time','Slot confirmation rate','Ticket data completeness'], esc:'Reporting line not in workbook — to confirm.'},
+ {id:'mrunal',name:'Mrunal',role:'Technician Coordinator – PM (vendor)',grp:'Coordination',wf:'PM',src:'wb',reportsTo:'pradeep',color:'#246F8E',
+  summary:'One of the Technician Coordinators jointly listed on PM steps 4–12 and PM admin (attendance, uniform, timely reporting, tools). The workbook does not split work between coordinators.',
+  roster:{A:['X','A','A','A','A','A','A'],B:['X','A','A','A','A','A','A']}, backup:{A:'vivek',B:'rakhi'},
+  kpis:['PM dispatched vs planned','PM overdue (own portfolio)','W/O closure lag','Vendor attendance'], esc:'Escalates to Pradeep.'},
+ {id:'vivek',name:'Vivek',role:'Technician Coordinator – PM (vendor)',grp:'Coordination',wf:'PM',src:'wb',reportsTo:'pradeep',color:'#246F8E',scen:['A'],
+  summary:'Listed in the workbook as a Technician Coordinator. The Mumbai org chart names Rahul in this position instead — confirm which is current.',
+  roster:{A:['B','X','B','B','B','B','B']}, backup:{A:'mrunal'},
+  kpis:['PM dispatched vs planned','PM overdue (own portfolio)','W/O closure lag'], esc:'Escalates to Pradeep.'},
+ {id:'rahul',name:'Rahul',role:'Technician Coordinator – PM (vendor)',grp:'Coordination',wf:'PM',src:'org',reportsTo:'pradeep',color:'#246F8E',scen:['B'],
+  summary:'Not in the workbook. Named in the Mumbai org chart in place of Vivek.',
+  roster:{B:['B','X','B','B','B','B','B']}, backup:{B:'rakhi'},
+  kpis:['PM dispatched vs planned','PM overdue (own portfolio)','W/O closure lag'], esc:'Escalates to Pradeep.'},
+ {id:'rakhi',name:'Rakhi',role:'Technician Coordinator – PM (vendor)',grp:'Coordination',wf:'PM',src:'wb',reportsTo:'pradeep',color:'#246F8E',
+  summary:'One of the Technician Coordinators jointly listed on PM steps 4–12 and PM admin. In scenario B works as the roster floater so both shifts stay covered with three coordinators.',
+  roster:{A:['A','A','A','X','A','A','A'],B:['A','B','X','G','G','G','G']}, backup:{A:'siddesh',B:'mrunal'},
+  kpis:['PM dispatched vs planned','PM overdue (own portfolio)','W/O closure lag'], esc:'Escalates to Pradeep.'},
+ {id:'siddesh',name:'Siddesh',role:'Technician Coordinator – PM (workbook) / PM DEO (org chart)',grp:'Coordination',wf:'PM',src:'wb',reportsTo:'pradeep',color:'#246F8E',
+  summary:'Workbook lists Siddesh as a Technician Coordinator. The Mumbai org chart lists Siddesh as PM Data Entry Operator. Scenario A follows the workbook; scenario B follows the org chart.',
+  roster:{A:['B','B','B','B','B','X','B'],B:['G','G','X','G','G','G','G']}, backup:{A:'rakhi',B:'karan'},
+  kpis:['PM dispatched vs planned / PM data completeness'], esc:'Escalates to Pradeep.'},
+ {id:'mahesh',name:'Mahesh',role:'Tools & spares (warehouse)',grp:'Support',wf:'Both',src:'wb',reportsTo:'anil',color:'#5E5A2E',
+  summary:'Listed with Anil on tools allocation for technicians and the spare return process. The workbook’s “Warehouse” (recipient of zero invoices and invoices in steps 14 and 16) is not named — Mahesh is a likely but unconfirmed owner.',
+  roster:{A:['G','G','G','G','G','G','X']}, kpis:['Spare return cycle time','Tool allocation compliance'], esc:'Escalates to Anil.'},
+ {id:'anuja',name:'Anuja',role:'PM planning data (role to confirm)',grp:'Support',wf:'PM',src:'wb',reportsTo:'pradeep',color:'#5E5A2E',
+  summary:'Appears in brackets on PM step 1 (“Automated and Pradeep/Anil (Anuja)”). Assumed to prepare the monthly PM plan data. Role, reporting line and working hours are not in the workbook.',
+  roster:{A:['G','G','G','G','G','G','X']}, kpis:['Monthly PM plan published on time'], esc:'Escalates to Pradeep.'},
+ {id:'tech_bd',name:'BD Technicians',role:'In-house BD technicians (26)',grp:'Field',wf:'BD',src:'wb',team:true,reportsTo:'rakesh',color:'#8A6C84',
+  summary:'Workbook: “Rakesh (16) & Shakeel (6+4)” for technician roster/attendance/leaves — 26 in-house technicians administered by the two BD Service Coordinators. Execute field steps 7A–7G for first and follow-up visits.',
+  roster:{}, kpis:['First-time fix','Job sheet completeness','Trip discipline (7A–7G)','Uniform compliance'], esc:'Rakesh (first visits) / Shakeel (follow-ups).'},
+ {id:'tech_pm',name:'PM Vendor Teams',role:'Third-party PM vendor technicians',grp:'Field',wf:'PM',src:'wb',team:true,reportsTo:'pradeep',color:'#5B8CA0',
+  summary:'Execute PM field activity (PM 7, 11). Count is not in the workbook; the Mumbai org chart shows 30 third-party PM teams.',
+  roster:{}, kpis:['PM completed vs dispatched','Repeat PM issue','Machine-failure detection'], esc:'Technician Coordinators → Pradeep.'},
+ {id:'warehouse',name:'Warehouse',role:'Warehouse / spares desk (owner not named)',grp:'Support',wf:'BD',src:'wb',team:true,reportsTo:null,vacant:true,color:'#B42318',
+  summary:'Receives the zero invoice (FoC, step 14) and paid invoice (billable, step 16) to release spares. No person is named in the workbook.',
+  roster:{}, kpis:['Spare dispatch within target after invoice'], esc:'Not defined.'}
+];
+
+/* ---------- BD WORKFLOW ---------- */
+const BD_STAGES=[
+ {k:'intake',n:'Intake',lane:'CC + DEO',steps:['1','2','3']},
+ {k:'first',n:'First visit — appointment, field work, closure',lane:'SC1 Rakesh · Technicians',steps:['4','5','6','7','8','9','10'],decision:{id:'D1',q:'Follow-up visit needed?',no:'Ticket closed · Report 1',yes:'Go to step 11'}},
+ {k:'fusetup',n:'Follow-up set-up and spare path',lane:'SC2 Shakeel · ASM JP',steps:['11','12','13'],branches:[
+    {h:'Free of charge (FoC)',chain:['14']},
+    {h:'Billable — customer agrees',chain:['15','16']},
+    {h:'Billable — customer does not agree',chain:['23','24']}]},
+ {k:'fuexec',n:'Follow-up execution and closure',lane:'SC2 Shakeel · Technicians',steps:['17','18','19','20','21','22'],end:'Ticket closed · Report 2'}
+];
+const BD_STEPS={
+ '1':{act:'Ticket raise',raw:'Cotact Centre (CC) / Cotact Centre (CC)',o:['cc'],sup:[],sla:'',out:'BD ticket with customer, site, asset (MAC / serial) and complaint captured',next:['2'],esc:'CC lead → Rakesh (SC1) — CC reporting line not in workbook',fsm:'Zoho Desk ticket (Desk → FSM integration). Asset = MAC address (universal join key).'},
+ '2':{act:'Time-slot confirmation',raw:'CC / CC',o:['cc'],sup:[],sla:'',out:'Customer-confirmed visit slot',next:['3'],esc:'Rakesh (SC1)',fsm:'Preferred date/time on Request (field to confirm)'},
+ '3':{act:'Ticket → Request → W/O → Appointment',raw:'CC+DEO / CC+Karan',o:['cc','karan'],sup:[],sla:'',out:'FSM Request, Work Order and Service Appointment (status Scheduled)',next:['4'],esc:'Rakesh (SC1)',fsm:'FSM Request → Work Order → Service Appointment',flags:[['p1','Two owners (CC + Karan) on one step. Primary accountable owner needed for creation-time KPI.']]},
+ '4':{act:'Appointment verification / adjustment',raw:'Service Coordiator 1 / Rakesh',o:['rakesh'],sup:['tech_bd'],sla:'T+1 for 90% of tickets (SC1 group target)',out:'Verified appointment with technician assigned and dispatched',next:['5','6'],esc:'JP (ASM BD) → Anil',fsm:'Dispatch Console · Service Appointment Scheduled → Dispatched'},
+ '5':{act:'Appointment rescheduling',raw:'Service Coordiator 1 / Rakesh',o:['rakesh'],sup:['cc'],sla:'Within T+1 target',out:'Rescheduled appointment with reason logged',next:['6'],esc:'JP (ASM BD)',fsm:'Service Appointment reschedule; reason code (custom field — to confirm)'},
+ '6':{act:'Technician supervision',raw:'Service Coordiator 1 / Rakesh',o:['rakesh'],sup:['tech_bd'],sla:'Within T+1 target',out:'Technician on route / on site as planned',next:['7'],esc:'JP (ASM BD)',fsm:'Dispatch Console live view; Trips'},
+ '7':{act:'Field-level activity (7A–7G)',raw:'Technician (no person named)',o:['tech_bd'],sup:['rakesh'],sla:'Within T+1 target',out:'Completed work with job sheet and asset mapped',next:['8'],esc:'Rakesh (SC1)',fsm:'Trips, Service Appointment status, Job Sheet, Asset on W/O',
+      subs:[['7A','Start trip','Trip start (time, GPS)'],['7B','End trip','Trip end (time, distance)'],['7C','Start work','SA → In Progress; timesheet start'],['7D','Map asset to appointment','Asset (MAC) linked to W/O'],['7E','Fill job sheet','Job Sheet submitted'],['7F','Complete the work','SA → Completed; timesheet end'],['7G','Start trip to next location','Next Trip start']]},
+ '8':{act:'Fill RCA',raw:'Service Coordiator 1 / Rakesh',o:['rakesh'],sup:['tech_bd'],sla:'',out:'Root-cause code recorded on the W/O',next:['9'],esc:'JP (ASM BD)',fsm:'RCA field on W/O (custom picklist — to confirm)',flags:[['p1','RCA is filled by the coordinator, not the technician on site. Risk to RCA quality used in Report 5.']]},
+ '9':{act:'W/O closure',raw:'Service Coordiator 1 / Rakesh',o:['rakesh'],sup:[],sla:'',out:'Work Order completed / closed',next:['10'],esc:'JP (ASM BD)',fsm:'Work Order status → Completed / Closed'},
+ '10':{act:'Ensure all activities done and ticket closed',raw:'Service Coordiator 1 / Rakesh · Report 1',o:['rakesh'],sup:[],sla:'T+1 for 90% of tickets',out:'Desk ticket closed, or follow-up flagged → step 11',next:['11'],esc:'JP (ASM BD)',fsm:'Desk ticket status Closed; follow-up flag',report:'BD Report 1'},
+ '11':{act:'Follow-up W/O',raw:'Service Coordiator 2 / Shakeel',o:['shakeel'],sup:[],sla:'T+2 for follow-up visit (SC2 group target)',out:'Follow-up W/O linked to parent ticket',next:['12'],esc:'JP (ASM BD)',fsm:'New W/O with parent reference (custom lookup — to confirm)'},
+ '12':{act:'Discuss with technician',raw:'Service Coordiator 2 / Shakeel',o:['shakeel'],sup:['tech_bd'],sla:'Within T+2',out:'Agreed fix and parts list',next:['13'],esc:'JP (ASM BD)',fsm:'W/O notes'},
+ '13':{act:'Include spare requirement',raw:'Service Coordiator 2 / Shakeel',o:['shakeel'],sup:[],sla:'Within T+2',out:'Parts line items on the W/O; FoC or billable decision',next:['14','15'],esc:'JP (ASM BD)',fsm:'W/O parts line items (Service & Parts)'},
+ '14':{act:'If FoC — create zero invoice and share with warehouse',raw:'Service Coordiator 2 / Shakeel',o:['shakeel'],sup:['warehouse'],sla:'Within T+2',out:'₹0 invoice and spare release request',next:['17'],esc:'JP (ASM BD)',fsm:'Invoice (₹0) — FSM / Zoho Books; warehouse dispatch (to confirm)',flags:[['p1','Warehouse recipient is not named in the workbook.']]},
+ '15':{act:'If billable — create quotation and discuss with customer',raw:'ASM / JP',o:['jp'],sup:['shakeel'],sla:'T+4 for billable-discussion issues (listed under “SC 3”)',out:'Quotation sent; customer decision',next:['16','23'],esc:'Anil',fsm:'FSM Estimate — Sent / Accepted / Declined (status names to confirm)',flags:[['p0','T+4 target is written against “SC 3”, but the step is owned by ASM JP and no SC3 is named. KPI owner is unclear.']]},
+ '16':{act:'Customer agrees and pays — create invoice and share with warehouse',raw:'ASM / JP',o:['jp'],sup:['warehouse'],sla:'Within T+4',out:'Invoice raised, payment confirmed, spare release',next:['17'],esc:'Anil',fsm:'Invoice + payment (Zoho Books); warehouse dispatch'},
+ '17':{act:'Create appointment for W/O',raw:'Service Coordiator 2 / Shakeel',o:['shakeel'],sup:[],sla:'T+2 (FoC) / T+4 (billable)',out:'Follow-up Service Appointment scheduled',next:['18'],esc:'JP (ASM BD)',fsm:'Service Appointment on follow-up W/O'},
+ '18':{act:'Technician supervision',raw:'Service Coordiator 2 / Shakeel',o:['shakeel'],sup:['tech_bd'],sla:'',out:'Technician on site as planned',next:['19'],esc:'JP (ASM BD)',fsm:'Dispatch Console; Trips'},
+ '19':{act:'Field-level activity (7A–7G)',raw:'Technician',o:['tech_bd'],sup:['shakeel'],sla:'',out:'Follow-up work completed with job sheet',next:['20'],esc:'Shakeel (SC2)',fsm:'Trips, SA status, Job Sheet, Asset'},
+ '20':{act:'Fill RCA',raw:'Service Coordiator 2 / Shakeel',o:['shakeel'],sup:[],sla:'',out:'RCA recorded',next:['21'],esc:'JP (ASM BD)',fsm:'RCA field (to confirm)'},
+ '21':{act:'W/O closure',raw:'Service Coordiator 2 / Shakeel',o:['shakeel'],sup:[],sla:'',out:'Follow-up W/O closed',next:['22'],esc:'JP (ASM BD)',fsm:'W/O status → Completed / Closed'},
+ '22':{act:'Ensure all activities done and ticket closed',raw:'Service Coordiator 2 / Shakeel · Report 2',o:['shakeel'],sup:[],sla:'T+2 / T+4',out:'Desk ticket closed',next:[],esc:'JP (ASM BD)',fsm:'Desk ticket Closed',report:'BD Report 2'},
+ '23':{act:'Customer does not agree — escalate to ASM',raw:'ASM / New',o:['asm_new'],sup:['jp'],sla:'',out:'Escalation logged and owned',next:['24'],esc:'Anil',fsm:'Escalation flag + reason on W/O / Desk ticket (custom — to confirm)',flags:[['p0','Owner written as “New”. Treated as a vacant ASM position; JP shown as interim.']]},
+ '24':{act:'ASM executes process 14 to 20',raw:'ASM / JP',o:['jp'],sup:['shakeel','tech_bd'],sla:'',out:'Negotiated resolution executed through W/O, appointment, field work and RCA',next:['14','17','20'],esc:'Anil',fsm:'Same objects as steps 14–20',flags:[['p1','The ASM personally runs coordinator-level steps 14–20 for escalated cases — a capacity drain on JP. Consider: ASM decides, SC2 executes.']]}
+};
+const BD_GOV=[
+ {g:'Daily reviews — target achievement for all in team',rows:[
+  ['Daily appointment review','ASM / SC1 & 2','JP',['jp','rakesh','shakeel'],'BD Report 1 · Daily'],
+  ['Daily spare dispatch review','ASM / SC1 & 2','JP',['jp','rakesh','shakeel'],'BD Report 1 · Daily'],
+  ['Daily pending / follow-up / customer-dependency cases','ASM / SC3','JP',['jp'],'BD Report 2 · Daily'],
+  ['Daily escalated / delayed calls','ASM / Service Head','JP // Anil',['jp','anil'],'BD Report 3 · Daily']]},
+ {g:'Service Head analysis',rows:[
+  ['Ticket analysis — TAT / cost / RCA','Service Head','Anil',['anil'],'BD Report 4 · Weekly'],
+  ['Quality failure and penalty, repeat-issue analysis','Service Head','Anil',['anil'],'BD Report 5 · Weekly'],
+  ['Quality review with action points','Service Head / ASM','Anil / Pradip',['anil','pradeep'],'BD Report 5 · Weekly','p1'],
+  ['Cost analysis','Service Head','Anil',['anil'],'BD Report 6 · Weekly']]},
+ {g:'Technician administration',rows:[
+  ['Technician roster / attendance / leaves','SC 1 & 2','Rakesh (16) & Shakeel (6+4) / ASM',['rakesh','shakeel','jp'],''],
+  ['Technician expense approval','SC 1 & 2','Rakesh & Shakeel',['rakesh','shakeel'],''],
+  ['On-field purchases','SC 2 & ASM','Shakeel & JP',['shakeel','jp'],''],
+  ['New technician recruitment and onboarding','Service Head','Anil',['anil'],''],
+  ['Tools allocation for technicians','Service Head','Mahesh / Anil',['mahesh','anil'],''],
+  ['Spare return process','Service Head','Mahesh / Anil',['mahesh','anil'],'']]},
+ {g:'Service Coordinator discipline',rows:[
+  ['Daily technician attendance','SC 1','(blank — Rakesh assumed)',['rakesh'],'BD Report 10'],
+  ['Daily uniform compliance','SC 1','(blank — Rakesh assumed)',['rakesh'],''],
+  ['Timely reporting','SC 1','(blank — Rakesh assumed)',['rakesh'],'']]}
+];
+
+/* ---------- PM WORKFLOW ---------- */
+const PM_STAGES=[
+ {k:'plan',n:'Monthly PM planning',lane:'ASM PM · Service Head · Anuja',steps:['1'],variant:'planned'},
+ {k:'sched',n:'Customer confirmation, request, W/O and dispatch',lane:'CC · Technician Coordinators',steps:['2','3','4','5']},
+ {k:'exec',n:'Technician follow-up, field activity and W/O closure',lane:'Technician Coordinators · Vendor teams',steps:['6','7','8'],branches:[
+    {h:'PM follow-up needed',chain:['9','10','11','12']},
+    {h:'Machine failure found',chain:['13','14']},
+    {h:'PM complete — no follow-up',chain:[]}]},
+ {k:'close',n:'ASM verification and final closure',lane:'ASM PM Pradeep',steps:['15','16'],end:'PM request / ticket closed'}
+];
+const PM_STEPS={
+ '1':{act:'Monthly PM planned data through FSM or GSheet',raw:'ASM/Service Head · Automated and Pradeep/Anil (Anuja)',o:['pradeep','anil'],sup:['anuja'],sla:'Monthly',out:'Monthly PM plan by asset / customer / cluster',next:['2'],esc:'Anil',fsm:'FSM Scheduled Maintenance plan (or GSheet today) — PM due date per asset',variants:{planned:true,ticket:false},flags:[['p1','Planned PM only. Two owners (Pradeep/Anil) and an unnamed role for Anuja.']]},
+ '2':{act:'Contact customer for time-slot confirmation',raw:'CC / CC / CC',o:['cc'],sup:[],sla:'',out:'Confirmed PM slot',next:['3'],esc:'Technician Coordinators → Pradeep',fsm:'Preferred slot on Request / W/O (to confirm)'},
+ '3':{act:'Raise the request based on the data',raw:'PM Ticket: CC/DEO · Position: CC · Person: “Eliminate (CC)”',o:['cc'],sup:['siddesh'],sla:'',out:'FSM Request (planned PM: to be eliminated)',next:['4'],esc:'Pradeep',fsm:'Planned PM: auto-generation from Scheduled Maintenance removes this step. PM Ticket: Request created by CC/DEO.',variantNote:'Planned PM: step marked “Eliminate”. PM Ticket: CC/DEO raises request.',flags:[['p1','Column layout on this row is ambiguous (PM Planned vs PM Ticket). Interpretation shown — please confirm.']]},
+ '4':{act:'Create the W/O',raw:'CC / Technician Coordinators · “Auto (Mrunal/Vivek/Rakhi/Siddesh)”',o:['tcs'],sup:['cc'],sla:'',out:'PM Work Order',next:['5'],esc:'Pradeep',fsm:'W/O auto-created from Scheduled Maintenance (target state); manual today'},
+ '5':{act:'Dispatch the appointment',raw:'CC / Technician Coordinators · CC/Mrunal/Vivek/Rakhi/Siddesh · Report 1',o:['tcs'],sup:['cc','tech_pm'],sla:'',out:'Service Appointment dispatched to vendor team',next:['6'],esc:'Pradeep',fsm:'Dispatch Console · SA Scheduled → Dispatched',report:'PM Report 1',flags:[['p1','Shared ownership between CC and four coordinators. Split basis (vendor / cluster) not defined.']]},
+ '6':{act:'Technician follow-up',raw:'Technician Coordinators',o:['tcs'],sup:['tech_pm'],sla:'',out:'Vendor team confirmed on site',next:['7'],esc:'Pradeep',fsm:'Trips; SA status'},
+ '7':{act:'Field activity',raw:'Technician',o:['tech_pm'],sup:['tcs'],sla:'',out:'PM checklist / job sheet completed',next:['8'],esc:'Technician Coordinators',fsm:'Job Sheet (PM checklist), SA Completed, Asset'},
+ '8':{act:'W/O closure',raw:'Technician Coordinators · Report 2',o:['tcs'],sup:[],sla:'',out:'PM W/O closed; outcome: done / PM follow-up / machine failure',next:['9','13','15'],esc:'Pradeep',fsm:'W/O Completed; outcome flag (to confirm)',report:'PM Report 2'},
+ '9':{act:'Follow-up W/O for PM itself',raw:'Technician Coordinators',o:['tcs'],sup:[],sla:'',out:'PM follow-up W/O',next:['10'],esc:'Pradeep',fsm:'New W/O linked to PM W/O'},
+ '10':{act:'Technician follow-up',raw:'Technician Coordinators',o:['tcs'],sup:['tech_pm'],sla:'',out:'Technician confirmed',next:['11'],esc:'Pradeep',fsm:'Trips; SA'},
+ '11':{act:'Field activity',raw:'Technician',o:['tech_pm'],sup:['tcs'],sla:'',out:'Follow-up completed',next:['12'],esc:'Technician Coordinators',fsm:'Job Sheet; SA Completed'},
+ '12':{act:'Follow-up W/O closure',raw:'Technician Coordinators',o:['tcs'],sup:[],sla:'',out:'Follow-up W/O closed',next:['15'],esc:'Pradeep',fsm:'W/O Completed'},
+ '13':{act:'Follow-up W/O for machine failure',raw:'BD Service Coordinator 2 · Shekeel',o:['shakeel'],sup:['tech_bd'],sla:'Not specified',out:'Machine-failure W/O (PM → BD conversion)',next:['14'],esc:'Pradeep / JP (joint — to define)',fsm:'W/O type = Machine failure; parent PM W/O (to confirm)',flags:[['p1','A BD coordinator owns a PM-workflow KPI. Decide whether this should become a BD ticket (BD KPIs) or stay PM (PM KPIs), and who owns it.']]},
+ '14':{act:'Follow-up W/O closure',raw:'BD Service Coordinator 2/ASM · Shekeel/Pradeep · Report 2',o:['shakeel','pradeep'],sup:[],sla:'',out:'Machine-failure W/O closed and verified',next:['15'],esc:'Pradeep',fsm:'W/O Completed',report:'PM Report 2'},
+ '15':{act:'Ensure PM service W/O-request is closed appropriately',raw:'ASM · Pradeep (Planned: W/O-Request · Ticket: Request)',o:['pradeep'],sup:[],sla:'',out:'PM request closed after verification',next:['16'],esc:'Anil',fsm:'Request status Closed'},
+ '16':{act:'Ensure ticket is closed appropriately',raw:'ASM · Pradeep (PM Ticket only)',o:['pradeep'],sup:[],sla:'',out:'Customer PM ticket closed',next:[],esc:'Anil',fsm:'Desk ticket Closed',variants:{planned:false,ticket:true}}
+};
+const PM_GOV=[
+ {g:'ASM daily reviews',rows:[
+  ['Daily appointment review','ASM','Pradeep',['pradeep'],'PM Report 1 · Daily'],
+  ['Daily pending / follow-up / customer-dependency cases','ASM','Pradeep',['pradeep'],'PM Report 2 · Daily'],
+  ['Daily escalated / delayed calls','ASM / Service Head','Pradeep / Anil',['pradeep','anil'],'PM Report 3 · Daily']]},
+ {g:'Weekly and monthly reviews',rows:[
+  ['Weekly service plan vs completion','ASM / Service Head','Pradeep / Anil',['pradeep','anil'],'PM Report 4 · Weekly'],
+  ['Quality failure and penalty, repeat-issue analysis','ASM / Service Head','Pradeep / Anil',['pradeep','anil'],'PM Report 5 · Weekly'],
+  ['Weekly quality review and action points','ASM / Service Head','Pradeep / Anil',['pradeep','anil'],'PM Report 5 · Weekly'],
+  ['Monthly vendor payout details / cost analysis','ASM / Service Head','Pradeep / Anil',['pradeep','anil'],'PM Report 6 · labelled “Weekly”','p1']]},
+ {g:'Vendor and tools',rows:[
+  ['Vendor team availability and utilisation','ASM','Pradeep',['pradeep'],''],
+  ['New vendor onboarding','ASM / Service Head','Pradeep / Anil',['pradeep','anil'],''],
+  ['Tools allocation for technicians','Technician Coordinator / ASM','Mrunal/Vivek/Rakhi/Siddesh/Pradeep',['tcs','pradeep'],'']]},
+ {g:'Technician Coordinator discipline',rows:[
+  ['Daily technician attendance','Technician Coordinators','Mrunal/Vivek/Rakhi/Siddesh',['tcs'],''],
+  ['Daily uniform compliance','Technician Coordinators','Mrunal/Vivek/Rakhi/Siddesh',['tcs'],''],
+  ['Timely reporting','Technician Coordinators','Mrunal/Vivek/Rakhi/Siddesh',['tcs'],'']]}
+];
+
+/* ---------- SERVICE HEAD DAY PLANS ---------- */
+const FLEX=['Report 4 — TAT / cost / RCA ticket analysis','Recruitment and onboarding of technicians','Report 5 — quality failure, penalty and repeat-issue review; quality review with ASMs','Report 6 — cost analysis and monthly vendor payout','Tools, spares return and vendor review (with Mahesh / Pradeep)','PM plan vs completion (Report 4), team 1:1s, buffer',''];
+function anilPlan(d){
+  const code=rosterCode(P('anil'),d); const tcs=tcIds();
+  if(code==='G') return [
+    [9.5,10,'Escalation triage — Report 3 queue','esc'],
+    [10,12.5,'BD ASM session with JP — BD daily reviews (Reports 1–2)','bd',['jp'],[[11,11.5,['rakesh','shakeel']]]],
+    [12.5,14,'PM ASM session with Pradeep — PM daily reviews','pm',['pradeep']],
+    [14,15,'Break','break'],
+    [15,16.5,'Escalated and delayed cases (Report 3)','esc',[],[[15,15.5,['jp']],[16,16.5,['pradeep']]]],
+    [16.5,18.5,FLEX[d],'flex']];
+  if(code==='A') return [ // Tuesday — JP weekly off
+    [8,8.5,'Escalation triage — Report 3 queue','esc'],
+    [8.5,11,'BD operations review with Rakesh (JP weekly off) — counts toward BD 2.5 h','bd',['rakesh']],
+    [11,12.5,'PM ASM session with Pradeep','pm',['pradeep']],
+    [12.5,13.5,'Break','break'],
+    [13.5,15,'Escalated and delayed cases — Service Head is BD escalation owner today','esc',[],[[13.5,14,['pradeep']]]],
+    [15,17,FLEX[d],'flex']];
+  if(code==='B') return [ // Thursday — Pradeep weekly off
+    [11,11.5,'Escalation triage — Report 3 queue','esc'],
+    [11.5,14,'BD ASM session with JP','bd',['jp']],
+    [14,15,'PM operations review with Technician Coordinators (Pradeep weekly off) — part 1','pm',tcs],
+    [15,16,'Break','break'],
+    [16,16.5,'PM operations review — part 2','pm',tcs],
+    [16.5,18,'Escalated and delayed cases — Service Head is PM escalation owner today','esc'],
+    [18,20,FLEX[d],'flex']];
+  return [];
+}
+const BREAK_OVERRIDE={jp:{3:[14,15]}}; // Thursday JP break moved so the Service Head session fits
+
+/* ---------- WORK TEMPLATES (fill free time) ---------- */
+const WORK={
+ jp:['Billable quotations and customer discussions (15)','Invoice after payment; share with warehouse (16)','Escalated disagreement cases — execute 14–20 (24)','On-field purchase approvals','Spare dispatch follow-through'],
+ pradeep:['Pending / follow-up / customer-dependency review (Report 2)','Vendor availability and utilisation','Machine-failure closure verification (PM 14)','PM request / ticket closure checks (15–16)','Vendor onboarding and payout prep'],
+ rakesh:['Appointment verification and adjustment (4)','Technician supervision (6)','Rescheduling (5)','Fill RCA (8) and W/O closure (9)','Leaves and expense approvals (16 technicians)'],
+ shakeel:['Follow-up W/O and technician discussion (11–12)','Spare requirement; FoC zero invoice (13–14)','Follow-up appointments and supervision (17–18)','RCA, W/O and ticket closure (20–22)','PM machine-failure follow-ups (PM 13–14)'],
+ vishal:['Billable case preparation for JP (T+4 support)','Cover SC1 / SC2 queue','Customer-dependency follow-ups','RCA completeness check'],
+ imran:['No workbook activity assigned — to define'],
+ karan:['Ticket → Request → W/O → Appointment creation (3)','Asset MAC mapping and data checks','Ticket → Request → W/O → Appointment creation (3)'],
+ tc:['Technician follow-up (6, 10)','W/O closure (8, 12)','Follow-up W/O for PM (9)','Vendor availability check and tools'],
+ siddeshB:['PM request / W/O data entry until auto-creation (3–4)','PM data completeness checks'],
+ mahesh:['Tools allocation','Spare return processing','Spare stock checks'],
+ anuja:['Monthly PM plan data preparation (1)','Activities beyond PM planning not defined in workbook']
+};
+function workFor(pid){ if(pid==='siddesh'&&S.scen==='B') return WORK.siddeshB; if(['mrunal','vivek','rahul','rakhi','siddesh'].includes(pid)) return WORK.tc; return WORK[pid]||['Assigned activities']; }
+function roleFixed(pid,code,d){
+  const out=[];
+  if(pid==='rakesh'&&code==='A'){ out.push([8,8.5,'Technician attendance and uniform check (Report 10)','report']); out.push([16,16.5,'Report 1 — ticket closure check (10)','report']); }
+  if(pid==='shakeel'){ if(code==='B'){ out.push([19,19.5,'Report 2 — follow-up closure check (22)','report']);} if(code==='A'){ out.push([8,8.5,'Technician attendance — 6+4 team','report']); out.push([16,16.5,'Report 2 — follow-up closure check (22)','report']);} }
+  if(pid==='jp'&&code==='A'){ out.push([8,8.5,'Overnight queue: pending, escalations, spare dispatch','meeting']); if(rosterCode(P('anil'),d)==='X'){ out.push([11,11.5,'Daily appointment and spare dispatch review with SC1 / SC2 (Report 1)','meeting']); out.push([15,15.5,'Escalated / delayed calls review (Report 3) — duty escalation owner','esc']); } }
+  if(pid==='pradeep'&&code==='B'){ out.push([19,20,'Final closure checks (15–16) and next-day PM plan','report']); if(rosterCode(P('anil'),d)==='X'){ out.push([12.5,13.5,'Daily appointment review (Report 1)','meeting']); } }
+  if(['mrunal','vivek','rahul','rakhi','siddesh'].includes(pid) && !(pid==='siddesh'&&S.scen==='B')){
+    if(code==='A'){ out.push([8,8.5,'Vendor technician attendance and uniform','report']); out.push([8.5,9.5,'Dispatch PM appointments (5) — Report 1','pmwork']); out.push([16,16.5,'Report 2 inputs — PM W/O closures','report']); }
+    if(code==='B'){ out.push([19,19.5,'Next-day dispatch preparation (Report 1)','pmwork']); }
+    if(code==='G'){ out.push([10,10.5,'Floater: check both shift queues','pmwork']); }
+  }
+  if(pid==='karan'&&code==='G'){ out.push([18,18.5,'Daily creation count and exceptions to SC1','report']); }
+  return out;
+}
+
+/* ---------- CAPACITY MODEL (placeholders) ---------- */
+const VOL_DEFAULT={bd:25,fuPct:30,billPct:30,agreePct:80,pm:40,pmFuPct:10,failPct:5,techBD:26,bdVisitMin:90,pmTeams:30,pmVisitMin:75,brk:1,meet:0.5};
+// [label, unit, minutes, ref]
+const TASKS={
+ anil:[['Report 4 — TAT / cost / RCA analysis','week',120,'BD gov 5'],['Report 5 — quality failure, penalty, repeat (BD)','week',90,'BD gov 6'],['Report 5 — quality failure, repeat (PM, with Pradeep)','week',60,'PM gov 5'],['Quality review with action points (BD)','week',60,'BD gov 7'],['Weekly quality review (PM)','week',60,'PM gov 7'],['Report 6 — cost analysis (BD)','week',60,'BD gov 8'],['Weekly plan vs completion (PM Report 4)','week',30,'PM gov 4'],['Technician recruitment and onboarding','week',120,'BD admin 4'],['Tools allocation and spare return (with Mahesh)','week',60,'BD admin 5–6'],['Team management and 1:1s','week',60,'asm'],['Monthly vendor payout / cost analysis','month',120,'PM gov 6'],['Monthly PM plan approval','month',60,'PM 1'],['New vendor onboarding (with Pradeep)','month',90,'PM admin 2']],
+ jp:[['Quotation and customer discussion','bill',20,'BD 15'],['Invoice after payment + warehouse','billok',10,'BD 16'],['Execute 14–20 for escalated cases','esc',60,'BD 24'],['Escalated / delayed calls (Report 3)','day',30,'BD gov 4'],['On-field purchase approvals','day',20,'BD admin 3'],['Technician roster sign-off','day',10,'BD admin 1']],
+ pradeep:[['PM request / ticket closure verification','pm',1.5,'PM 15–16'],['Machine-failure closure verification','fail',10,'PM 14'],['Daily appointment review (Report 1)','day',30,'PM gov 1'],['Pending / follow-up / cx dependency (Report 2)','day',30,'PM gov 2'],['Escalated / delayed calls (Report 3)','day',30,'PM gov 3'],['Plan vs completion (Report 4)','week',60,'PM gov 4'],['Quality failure / repeat (Report 5)','week',60,'PM gov 5'],['Weekly quality review','week',60,'PM gov 7'],['Vendor availability and utilisation','week',60,'PM admin 1'],['Tools allocation','week',30,'PM admin 3'],['Vendor payout / cost analysis','month',180,'PM gov 6'],['Monthly PM plan','month',180,'PM 1'],['New vendor onboarding','month',120,'PM admin 2']],
+ rakesh:[['Appointment verification / adjustment','bd',4,'BD 4'],['Rescheduling (≈20% of tickets)','bd',1,'BD 5'],['Technician supervision','bd',4,'BD 6'],['Fill RCA','bd',4,'BD 8'],['W/O closure','bd',3,'BD 9'],['Ticket closure check','bd',2,'BD 10'],['Attendance and uniform (Report 10)','day',20,'SC 1–2'],['Roster / leaves — 16 technicians','day',20,'Admin 1'],['Expense approvals','day',15,'Admin 2'],['Timely reporting (Report 1)','day',20,'SC 3'],['Daily review meeting','day',30,'BD gov 1–2']],
+ shakeel:[['Follow-up W/O','fu',5,'BD 11'],['Discuss with technician','fu',5,'BD 12'],['Spare requirement','fu',5,'BD 13'],['FoC zero invoice + warehouse','foc',8,'BD 14'],['Create appointment','fu',3,'BD 17'],['Technician supervision','fu',4,'BD 18'],['Fill RCA','fu',4,'BD 20'],['W/O closure','fu',3,'BD 21'],['Ticket closure','fu',2,'BD 22'],['Machine-failure follow-up W/O','fail',10,'PM 13'],['Machine-failure closure','fail',5,'PM 14'],['Roster / attendance — 6+4 technicians','day',15,'Admin 1'],['Expense approvals','day',10,'Admin 2'],['On-field purchases','day',15,'Admin 3'],['Report 2','day',20,'BD 22'],['Daily review meeting','day',30,'BD gov 1–2']],
+ vishal:[['Billable case preparation support (T+4)','bill',15,'org chart / proposal']],
+ imran:[],
+ karan:[['Ticket → Request → W/O → Appointment','bd',5,'BD 3'],['Data checks','day',30,'BD 3']],
+ cc:[['Ticket raise','bd',5,'BD 1'],['Time-slot confirmation','bd',4,'BD 2'],['Share of step 3 creation','bd',3,'BD 3'],['PM slot confirmation call','pm',6,'PM 2'],['PM request raise (to be eliminated)','pm',2,'PM 3'],['Share of PM W/O and dispatch','pm',2,'PM 4–5']],
+ tcs:[['W/O creation share (target: auto)','pm',1,'PM 4'],['Dispatch appointment','pm',2,'PM 5'],['Technician follow-up','pm',4,'PM 6'],['W/O closure','pm',3,'PM 8'],['PM follow-up W/O','pmfu',4,'PM 9'],['Follow-up technician follow-up','pmfu',4,'PM 10'],['Follow-up W/O closure','pmfu',3,'PM 12'],['Attendance and uniform (per coordinator)','dayEach',20,'TC 1–2'],['Timely reporting (per coordinator)','dayEach',20,'TC 3'],['Tools allocation (per coordinator)','dayEach',10,'PM admin 3']],
+ siddeshB:[['PM request / W/O data entry support','pm',2,'PM 3–4'],['Data checks','day',30,'org chart']],
+ mahesh:[['Tools allocation','week',120,'BD admin 5'],['Spare return process','week',180,'BD admin 6']],
+ anuja:[['Monthly PM plan data','month',480,'PM 1']]
+};
+
+/* ---------- ISSUES / QUESTIONS ---------- */
+const ISSUES=[
+ {id:'P0-1',pr:'p0',t:'12-hour coverage window and shift times are not defined',d:'The brief requires 12 h/day, 7 days/week, with individuals on ~9 h shifts and 6 days/week. The workbook has no hours. This blueprint assumes 08:00–20:00 with Shift A 08:00–17:00, Shift B 11:00–20:00 (6 h overlap) and a General shift 09:30–18:30, each including a 1-hour break.',q:'Confirm the coverage window and shift times. Is the 9-hour shift inclusive of a 1-hour break?',link:'roster'},
+ {id:'P0-2',pr:'p0',t:'Service Head: 6 fixed hours leave ~2 hours/day for everything else',d:'With a 9-hour day including a 1-hour break, the mandated 2.5 h (BD ASM) + 1.5 h (PM ASM) + 2 h (escalations) leaves 2 h/day, 12 h/week. The placeholder estimate for Anil’s weekly and monthly workbook duties (Reports 4–6, two quality reviews, recruitment, tools and spares, vendor payout and onboarding, team management) is ≈13 h/week — already over capacity with no buffer. Anil is also absent on his weekly off and for 3 h of every 12-hour day.',q:'Should the daily BD/PM reviews (Reports 1–3) sit inside the 2.5 h / 1.5 h ASM sessions (as drafted), and do you accept the on-duty ASM as escalation owner when the Service Head is off?',link:'sh'},
+ {id:'P0-3',pr:'p0',t:'BD Service Coordinator layer cannot cover 7 × 12 with two people',d:'Only Rakesh (SC1) and Shakeel (SC2) are named. Two people give 108 rostered hours against 168 needed to staff both seats for 84 hours each; at least one SC is missing for 6 h/week even with perfect staggering, and on each weekly off one person carries both T+1 and T+2 queues alone. The workbook also refers to an “SC3” (T+4 billable target and daily pending review) that is not named.',q:'Is Vishal (BD Service Coordinator in the org chart) the SC3 in this workflow and available to the roster? If not, which gap do you accept?',link:'roster'},
+ {id:'P0-4',pr:'p0',t:'BD step 23 is owned by “New”',d:'The escalation of customer disagreements to ASM has no named owner. JP is shown as interim, which adds escalation load to a role already giving 2.5 h/day to the Service Head session and personally executing steps 14–20 on escalated cases (step 24).',q:'Is “New” a vacancy being hired? Who owns step 23 until then?',link:'bd/23'},
+ {id:'P0-5',pr:'p0',t:'Contact Centre headcount and reporting line are unknown',d:'CC is the entry point for both workflows (BD 1–3, PM 2–5). A single CC seat needs at least 2 people for 7 × 12 coverage (84 h ÷ 54 h). At placeholder volumes the CC workload model needs ≈'+'{CCFTE}'+' FTE.',q:'How many CC agents handle Mumbai BD and PM, on what hours, and to whom do they report?',link:'person/cc'},
+ {id:'P0-6',pr:'p0',t:'Technician Coordinator list and split are inconsistent',d:'The workbook lists Mrunal / Vivek / Rakhi / Siddesh jointly on every PM step. The org chart names Rahul instead of Vivek and moves Siddesh to PM DEO. With no split by vendor or cluster, no coordinator can be held individually accountable for PM KPIs.',q:'Who are the current Technician Coordinators, and is PM work split by vendor team, cluster, or shift?',link:'people'},
+ {id:'P0-7',pr:'p0',t:'Technician working pattern is not defined',d:'26 in-house BD technicians (Rakesh 16, Shakeel 6+4) and an unconfirmed number of PM vendor teams. Coordinator Shift B only adds value if technicians are working in the evening. If technicians only work a day shift, 12-hour coordinator coverage is partly idle.',q:'Do technicians and vendor teams work staggered shifts across 08:00–20:00, and what are their weekly offs?',link:'roster'},
+ {id:'P0-8',pr:'p0',t:'No volume or handling-time data',d:'All workload hours in this blueprint use placeholder volumes (25 BD tickets/day, 40 PM visits/day) and placeholder minutes per task. Capacity status (under / near / over) cannot be validated until replaced with Zoho FSM history.',q:'Provide 90-day averages: BD tickets/day, % needing follow-up, % billable, PM visits/day, and — if available — time per step.',link:'live'},
+ {id:'P1-1',pr:'p1',t:'T+n targets are not defined precisely',d:'T+1 (90%), T+2 and T+4 do not say whether days are calendar or working, measured from which timestamp (Desk ticket created / follow-up W/O created) to which event (appointment dispatched / work completed / ticket closed). PM has no SLA in the workbook.',q:'Define start and stop events for each target, and set a PM completion SLA.',link:'kpi'},
+ {id:'P1-2',pr:'p1',t:'BD quality review lists “Anil / Pradip”',d:'Pradeep is the PM ASM. For the BD sheet, JP would be expected.',q:'Should the BD quality review be Anil / JP?',link:'bd'},
+ {id:'P1-3',pr:'p1',t:'Report numbering collides between BD and PM',d:'Both sheets use Report 1–6 for different reports. This blueprint namespaces them as BD Report n and PM Report n. PM Report 6 is “Monthly vendor payout” but labelled Weekly.',q:'Confirm namespacing and whether PM Report 6 is weekly or monthly.',link:'kpi'},
+ {id:'P1-4',pr:'p1',t:'Warehouse owner not named',d:'Steps 14 and 16 hand invoices to “Warehouse”. Mahesh (tools, spare return) is a likely owner.',q:'Who receives zero invoices and paid invoices and releases spares?',link:'person/warehouse'},
+ {id:'P1-5',pr:'p1',t:'RCA filled by coordinators, not technicians',d:'Steps 8 and 20 put RCA with SC1/SC2. Weekly repeat-issue analysis (Report 5) depends on RCA quality.',q:'Should technicians select RCA in the job sheet with coordinator validation?',link:'bd/8'},
+ {id:'P1-6',pr:'p1',t:'ASM executes coordinator steps on escalations',d:'Step 24: ASM does steps 14–20 personally. At placeholder volumes this is ≈3 h/week for JP and grows with escalations.',q:'Can the ASM decide and SC2 execute?',link:'bd/24'},
+ {id:'P1-7',pr:'p1',t:'PM machine failure owned by BD SC2',d:'PM 13–14 sits with Shakeel, adding PM load to the BD follow-up owner and blurring PM vs BD KPI attribution. Imran (PM Service Coordinator, org chart) has no workbook activity.',q:'Should machine failures convert into BD tickets (BD KPIs) or stay as PM follow-ups owned by a PM coordinator?',link:'pm/13'},
+ {id:'P1-8',pr:'p1',t:'Dependency statuses need fields that may not exist',d:'Awaiting customer / spare / payment / quotation, escalation flag, parent W/O link and RCA code are needed for the dashboards. These are likely custom fields in Zoho FSM.',q:'Which of these fields already exist in your FSM configuration?',link:'data'},
+ {id:'P1-9',pr:'p1',t:'Cross-training for backups',d:'The roster depends on JP ↔ Pradeep covering each other’s escalation authority on weekly offs, and Rakesh ↔ Shakeel covering each other’s queues.',q:'Can JP and Pradeep hold each other’s escalation authority, and can SC1/SC2 run each other’s queues?',link:'roster'},
+ {id:'P1-10',pr:'p1',t:'Two PM variants in one sheet',d:'Columns “PM Planned” and “PM Ticket” differ on steps 1, 3, 15 and 16. Row 3 is ambiguous (Eliminate (CC) vs CC/DEO).',q:'Confirm the interpretation shown on the PM page.',link:'pm'},
+ {id:'P2-1',pr:'p2',t:'Name and spelling normalisation',d:'Pradeep/Pradip, Shakeel/Shekeel, Cotact → Contact. Service Coordinator discipline rows (attendance, uniform, reporting) have no person; Rakesh assumed as SC1.',q:'',link:'people'},
+ {id:'P2-2',pr:'p2',t:'Capacity thresholds are assumptions',d:'Under < 85%, near 85–100%, over > 100% of productive hours. Minutes per task are placeholders to calibrate from FSM timestamps.',q:'',link:'live'},
+ {id:'P2-3',pr:'p2',t:'Sunday PM',d:'The roster keeps Technician Coordinators on Sunday. Many commercial customers may not allow Sunday PM access, or may prefer it.',q:'',link:'roster'},
+ {id:'P2-4',pr:'p2',t:'Mahesh and Anuja working pattern',d:'Rostered on the General shift as an assumption.',q:'',link:'roster'}
+];
+
+/* ---------- ACCOUNTABILITY MATRIX ---------- */
+function ACCT(){ const B=S.scen==='B'; return [
+ ['BD intake (1–3)','bd',['cc','karan'],B?['siddesh']:['cc'],'rakesh','CC logs every ticket before shift end; DEO clears creation backlog by 18:30; open items listed in handover note.'],
+ ['BD first visit — T+1 (4–10)','bd',['rakesh'],B?['vishal']:['shakeel'],'jp','16:30 handover: open appointments, reschedules, techs still in field. On Rakesh’s Sunday off, backup works his queue; T+1 KPI stays with Rakesh.'],
+ ['BD follow-up — T+2 (11–14, 17–22)','bd',['shakeel'],B?['vishal']:['rakesh'],'jp','Evening close-out note at 19:30 for next-morning pickup. Wednesday off: backup owns actions, KPI stays with Shakeel.'],
+ ['BD billable — T+4 (15–16)','bd',['jp'],B?['vishal','pradeep']:['pradeep'],'anil','Quotation status updated in FSM before handover; Tuesday off: Pradeep approves, JP remains KPI owner.'],
+ ['BD disagreement escalation (23–24)','bd',['asm_new'],['jp'],'anil','Interim owner JP until “New” is appointed.'],
+ ['PM monthly plan (1)','pm',['pradeep'],['anil'],'anil','Plan published before month start; Anuja prepares data.'],
+ ['PM confirmation and dispatch (2–5)','pm',['cc'].concat(tcIds()),['cc'],'pradeep','Next-day dispatch list ready by 19:00; each coordinator’s buddy covers weekly off.'],
+ ['PM execution and closure (6–12)','pm',tcIds(),tcIds().slice().reverse(),'pradeep','Each vendor team has one primary coordinator (split to confirm); buddy covers off days.'],
+ ['PM machine failure (13–14)','pm',['shakeel'],B?['vishal']:['rakesh'],'pradeep','Joint closure with Pradeep; PM→BD attribution to decide.'],
+ ['PM final closure (15–16)','pm',['pradeep'],['jp'],'anil','Thursday off: JP verifies closures; KPI stays with Pradeep.'],
+ ['Tools and spare return','both',['mahesh'],['anil'],'anil','Weekly reconciliation with Service Coordinators.'],
+ ['Technician admin — BD (roster, leave, expenses)','bd',['rakesh','shakeel'],['jp'],'jp','Rakesh 16 technicians, Shakeel 6+4.'],
+ ['Escalation authority','both',['anil'],['jp','pradeep'],'anil','Outside Anil’s hours and on Sunday: JP for BD, Pradeep for PM. On JP’s off day Pradeep holds BD authority and vice versa.']
+];}
+
+/* ---------- ZOHO FSM DATA DICTIONARY ---------- */
+// status: C = activity confirmed in workbook (field name to confirm) · S = likely standard FSM/Desk object (to confirm) · X = custom field required (to confirm)
+const FIELDS=[
+ ['Ticket ID','Zoho Desk — Ticket','S','BD 1, 10, 22; ageing, SLA, repeat','Desk WS 441267000000130002 · Tickets view 441267000000130021'],
+ ['Ticket created time','Zoho Desk — Ticket','S','T+n ageing start; new today',''],
+ ['Ticket status / closed time','Zoho Desk — Ticket','S','Closure pending; closed today',''],
+ ['Request ID / status','FSM — Request','C','BD 3; PM 3',''],
+ ['Work Order ID / status / type','FSM — Work Order','C','All W/O steps; PM vs BD vs follow-up vs machine failure','FSM WS 441267000002815063'],
+ ['Parent W/O / parent ticket link','FSM — Work Order','X','Follow-up linkage (11, PM 9, PM 13); first-time fix',''],
+ ['Service Appointment ID / status','FSM — Service Appointment','C','Pending / dispatched / in progress / completed','Status names to confirm in your configuration'],
+ ['Scheduled start / end','FSM — Service Appointment','S','Due today; slot adherence',''],
+ ['Actual start / end work','FSM — Service Appointment / Timesheet','C','7C, 7F; work duration; TAT',''],
+ ['Trip start / end, distance','FSM — Trips','C','7A, 7B, 7G; en route; travel cost',''],
+ ['Service resource (technician) / crew','FSM — Service Appointment','S','Technician workload and utilisation',''],
+ ['Coordinator owner','FSM — Work Order','X','Individual coordinator workload (Rakesh / Shakeel / TC split)','Owner or custom lookup'],
+ ['ASM owner','FSM — Work Order / Territory','X','ASM workload; escalation routing',''],
+ ['Asset ID = MAC address / serial','FSM — Asset','C','7D mapping; repeat issue on same asset','Assets view 441267000002852308 · universal join key'],
+ ['Job sheet completed','FSM — Job Sheet','C','7E; PM checklist compliance',''],
+ ['Pending reason (customer / spare / payment / quotation / access)','FSM — Work Order','X','Dependency dashboards',''],
+ ['Pending since (datetime)','FSM — Work Order','X','Dependency ageing',''],
+ ['Escalation flag, reason, escalated at, escalated to','FSM — W/O or Desk ticket','X','BD 23–24; Report 3; escalation heatmap',''],
+ ['Priority','Zoho Desk / FSM','S','Queue ordering',''],
+ ['SLA due datetime (T+1 / T+2 / T+4 / PM)','Desk SLA or computed','X','SLA compliance and breach','Compute in Zoho Analytics if not stored'],
+ ['RCA code (picklist)','FSM — Work Order','X','8, 20; Report 5 repeat analysis',''],
+ ['Resolution / outcome (done / follow-up / machine failure)','FSM — Work Order','X','PM 8 branch; PM-to-BD conversion',''],
+ ['Reschedule count and reason','FSM — Service Appointment','X','BD 5; reschedule rate',''],
+ ['Parts line items (spare, qty, cost)','FSM — Work Order Service & Parts','S','13; spare dependency; cost per ticket',''],
+ ['Estimate ID / status / sent / accepted','FSM — Estimate','S','15; quotation acceptance; T+4',''],
+ ['Invoice ID / amount / status (incl. ₹0 FoC)','FSM — Invoice / Zoho Books','S','14, 16; awaiting payment','Books WS 441267000000016002'],
+ ['Payment date','Zoho Books','S','16; payment dependency',''],
+ ['Spare dispatch date (warehouse)','Inventory / warehouse record','X','Spare dispatch review (BD gov 2)','Source system to confirm'],
+ ['Territory / cluster','FSM — Territory','S','Heatmaps by cluster',''],
+ ['Shift (A / B / G)','Roster (outside FSM) or custom','X','Shift-wise workload and handover','Rakesh’s 15-day technician roster'],
+ ['Vendor / team','FSM — Crew / Service resource','S','Vendor utilisation, payout',''],
+ ['PM due date / plan month','FSM Scheduled Maintenance or GSheet','C','PM planned, due, overdue',''],
+ ['PM completion date','FSM — Service Appointment','S','Plan vs actual',''],
+ ['Customer dependency on PM','FSM — Work Order','X','PM customer dependency',''],
+ ['Repeat visit flag','Computed','X','Same asset new BD ≤ 30 days after closure (window to confirm)',''],
+ ['Penalty / quality failure','Custom or Books','X','Report 5',''],
+ ['Labour cost / vendor payout','Timesheets + vendor rate card / Books','X','Cost per ticket; Report 6','']
+];
+
+/* ---------- DASHBOARD SPECIFICATIONS ---------- */
+const DASH=[
+ {g:'BD',n:'BD open queue and intake',q:'How many BD tickets are open, how many came in today, how many closed?',f:['Ticket ID','Ticket created time','Ticket status / closed time','Territory / cluster'],c:'Open = status ≠ Closed · New today = created_date = today · Closed today = closed_date = today',r:'Every 30 min',o:['rakesh','jp'],t:'Open > 3 × average daily intake (assumption)',a:'JP rebalances technicians and adds follow-up slots; flag to Anil.'},
+ {g:'BD',n:'BD ageing T+0 … T+4+',q:'Which tickets are at risk of missing T+1 / T+2 / T+4?',f:['Ticket created time','Ticket status / closed time','Work Order ID / status / type'],c:'Age bucket = floor((now − created) / 1 day) → T+0, T+1, T+2, T+3, T+4+',r:'Hourly',o:['rakesh','shakeel'],t:'SC1: < 90% within T+1 · any first-visit ticket at T+2',a:'At T+1 end: Rakesh reschedules or reassigns; T+2: JP; T+4+: Anil (Report 3).'},
+ {g:'BD',n:'Appointment pipeline',q:'Where is every appointment right now?',f:['Service Appointment ID / status','Scheduled start / end','Trip start / end, distance','Service resource (technician) / crew'],c:'Pending = W/O without SA or SA Scheduled · Dispatched · Technician assigned · En route = trip started, not ended · WIP = In Progress',r:'Every 15 min',o:['rakesh'],t:'SA not dispatched 2 h before slot · en route > 90 min (assumption)',a:'Rakesh calls technician, reassigns in Dispatch Console, informs customer via CC.'},
+ {g:'BD',n:'Dependency board',q:'What is waiting on the customer, a spare, payment or quotation acceptance?',f:['Pending reason (customer / spare / payment / quotation / access)','Pending since (datetime)','Estimate ID / status / sent / accepted','Invoice ID / amount / status (incl. ₹0 FoC)','Payment date','Parts line items (spare, qty, cost)'],c:'Count and age by pending reason',r:'Hourly',o:['shakeel','jp'],t:'Spare > 48 h · quotation unanswered > 48 h · payment > 72 h (assumptions)',a:'Shakeel chases warehouse; JP calls customer; unresolved → Report 2 review.'},
+ {g:'BD',n:'Follow-up tracker (T+2)',q:'Are follow-up visits happening within T+2?',f:['Parent W/O / parent ticket link','Work Order ID / status / type','Actual start / end work'],c:'% follow-up W/Os with completed visit ≤ 2 days from follow-up W/O creation (definition to confirm)',r:'Daily',o:['shakeel'],t:'Target % not in workbook — to set',a:'Shakeel escalates to JP; JP reviews in daily pending review.'},
+ {g:'BD',n:'Billable discussion (T+4)',q:'Are billable cases resolved within T+4?',f:['Estimate ID / status / sent / accepted','Invoice ID / amount / status (incl. ₹0 FoC)','Payment date','Escalation flag, reason, escalated at, escalated to'],c:'Open quotations by age · acceptance rate = accepted ÷ sent · % closed ≤ T+4',r:'Daily',o:['jp'],t:'Any billable case at T+4 unresolved',a:'JP escalates to Anil; decline → step 23.'},
+ {g:'BD',n:'Escalated and delayed calls',q:'What needs Service Head attention today?',f:['Escalation flag, reason, escalated at, escalated to','SLA due datetime (T+1 / T+2 / T+4 / PM)','Coordinator owner','ASM owner'],c:'Escalated = flag true & open · Delayed = now > SLA due & open',r:'Every 30 min',o:['jp','anil'],t:'Escalation > 24 h without action',a:'Taken into Anil’s escalation block (Report 3).'},
+ {g:'BD',n:'First-time fix, repeat and reopened',q:'Are we fixing it the first time?',f:['Parent W/O / parent ticket link','Asset ID = MAC address / serial','Repeat visit flag','RCA code (picklist)'],c:'FTF = tickets closed with no follow-up W/O ÷ tickets closed · Repeat = new BD on same MAC ≤ 30 days after closure',r:'Weekly',o:['anil'],t:'Repeat > 5% (assumption)',a:'RCA deep-dive in Report 5 quality review.'},
+ {g:'BD',n:'RCA and closure pending',q:'What is done in the field but not closed in the system?',f:['Service Appointment ID / status','Work Order ID / status / type','RCA code (picklist)','Ticket status / closed time'],c:'SA completed & W/O open > 4 h · W/O closed & ticket open · W/O closed without RCA',r:'Every 2 h',o:['rakesh','shakeel'],t:'Any item > 24 h',a:'Owner clears before shift handover.'},
+ {g:'BD',n:'BD SLA compliance',q:'Are we meeting T+1 (90%), T+2 and T+4?',f:['Ticket created time','SLA due datetime (T+1 / T+2 / T+4 / PM)','Actual start / end work'],c:'Met ÷ due, by target, coordinator, cluster',r:'Daily / weekly',o:['rakesh','shakeel','jp'],t:'T+1 < 90%',a:'JP action plan in daily review; weekly with Anil.'},
+ {g:'PM',n:'PM plan vs actual',q:'Are we on track against this month’s PM plan?',f:['PM due date / plan month','PM completion date','Work Order ID / status / type'],c:'Planned, due to date, scheduled, completed; completion % = completed ÷ due to date',r:'Daily; weekly review (PM Report 4)',o:['pradeep'],t:'Completion < due-to-date − 5 pts (assumption)',a:'Pradeep re-plans with coordinators; vendor capacity review.'},
+ {g:'PM',n:'PM dispatch board',q:'What PM work is scheduled, dispatched or pending today?',f:['Service Appointment ID / status','Scheduled start / end','Vendor / team'],c:'Count by SA status and vendor team',r:'Every 30 min',o:tcIdsStatic(),t:'Scheduled but not dispatched by 09:30 (assumption)',a:'Coordinator dispatches or reassigns vendor team.'},
+ {g:'PM',n:'PM overdue',q:'Which PMs are past due?',f:['PM due date / plan month','PM completion date','Territory / cluster'],c:'Due date < today & not completed; age in days',r:'Daily',o:tcIdsStatic().concat(['pradeep']),t:'Any PM > 7 days overdue (assumption)',a:'Pradeep escalates vendor; customer contact via CC.'},
+ {g:'PM',n:'Customer and technician dependency',q:'Is PM blocked by the customer or by technician availability?',f:['Customer dependency on PM','Pending reason (customer / spare / payment / quotation / access)','Vendor / team'],c:'Count and age by dependency type',r:'Daily',o:['cc'].concat(tcIdsStatic()),t:'Customer dependency > 3 days',a:'CC reconfirms slot; coordinator escalates to Pradeep.'},
+ {g:'PM',n:'PM-to-BD conversion (machine failure)',q:'How many PM visits reveal breakdowns?',f:['Resolution / outcome (done / follow-up / machine failure)','Parent W/O / parent ticket link','Asset ID = MAC address / serial'],c:'Machine-failure W/Os ÷ PM completed',r:'Weekly',o:['shakeel','pradeep'],t:'Rising trend 3 weeks',a:'Quality review with vendor; asset health check.'},
+ {g:'PM',n:'Repeat PM issue and PM follow-ups',q:'Are the same assets needing repeat PM attention?',f:['Asset ID = MAC address / serial','Parent W/O / parent ticket link','RCA code (picklist)'],c:'PM follow-ups ÷ PM completed · repeat assets in cycle',r:'Weekly',o:['pradeep'],t:'Follow-up rate > 10% (assumption)',a:'Report 5 action points.'},
+ {g:'PM',n:'PM closure pending',q:'Is PM work done in the field but not closed?',f:['Service Appointment ID / status','Work Order ID / status / type','Request ID / status','Ticket status / closed time'],c:'SA completed & W/O or request open',r:'Daily',o:['pradeep'],t:'> 48 h (assumption)',a:'Pradeep closes or returns to coordinator.'},
+ {g:'PM',n:'PM completion trend and SLA adherence',q:'Daily, weekly, monthly completion and on-time %',f:['PM due date / plan month','PM completion date'],c:'Completed by day/week/month; on time = completed ≤ planned window (window to define)',r:'Daily',o:['pradeep','anil'],t:'PM SLA not in workbook — to set',a:'Weekly with Anil.'},
+ {g:'PM',n:'Vendor availability, utilisation and payout',q:'Are vendor teams available and productive, and what do we pay?',f:['Vendor / team','Actual start / end work','Labour cost / vendor payout'],c:'Utilisation = work hours ÷ available hours · visits per team per day · payout per visit',r:'Weekly; payout monthly',o:['pradeep','anil'],t:'Utilisation < 60% or > 95% (assumption)',a:'Rebalance portfolios; onboard vendor.'},
+ {g:'Individual',n:'Person scorecard (one per person)',q:'What is on my plate, what is late, and how am I doing?',f:['Coordinator owner','Service resource (technician) / crew','SLA due datetime (T+1 / T+2 / T+4 / PM)','Escalation flag, reason, escalated at, escalated to','Pending reason (customer / spare / payment / quotation / access)'],c:'Assigned today · open · ageing · due today · overdue · escalated · pending dependency · completed today · completion rate · average TAT · SLA % · rework / repeat · quality failures · productivity (closures / productive hour) · utilisation (assigned h ÷ productive h)',r:'Every 30 min',o:['jp','pradeep'],t:'Utilisation > 100% · overdue > 0 at handover',a:'ASM reassigns; backup called in.'},
+ {g:'Management',n:'Total workload by stage, person and role',q:'Where is the work and who holds it?',f:['Work Order ID / status / type','Coordinator owner','ASM owner','Service resource (technician) / crew'],c:'Open count by stage × owner; BD vs PM split',r:'Every 30 min',o:['anil'],t:'Any person > 120% of team median open load (assumption)',a:'Rebalance at next ASM session.'},
+ {g:'Management',n:'Ageing heatmap',q:'Where is ageing concentrated?',f:['Ticket created time','Work Order ID / status / type'],c:'Stage × age bucket count',r:'Hourly',o:['anil'],t:'Red cells (T+4+) non-zero',a:'Escalation block.'},
+ {g:'Management',n:'SLA breach and escalation heatmaps',q:'Which clusters and days breach most?',f:['SLA due datetime (T+1 / T+2 / T+4 / PM)','Territory / cluster','Escalation flag, reason, escalated at, escalated to'],c:'Breaches and escalations by cluster × day',r:'Daily',o:['anil'],t:'Cluster breach > 15% (assumption)',a:'Territory review with ASM.'},
+ {g:'Management',n:'Daily and weekly trend',q:'Is the backlog growing?',f:['Ticket created time','Ticket status / closed time','PM completion date'],c:'Created vs closed per day; net backlog change',r:'Daily',o:['anil'],t:'Backlog up 3 days in a row',a:'Capacity action (overtime, vendor support).'},
+ {g:'Management',n:'Team productivity and technician utilisation',q:'Is the team productive and are technicians used well?',f:['Actual start / end work','Trip start / end, distance','Service resource (technician) / crew','Shift (A / B / G)'],c:'Visits / technician / day · work hours ÷ rostered hours · travel share',r:'Daily',o:['anil','rakesh','shakeel'],t:'Utilisation < 60% or > 95%',a:'Roster and route changes.'},
+ {g:'Management',n:'Cost per service',q:'What does each BD and PM cost?',f:['Parts line items (spare, qty, cost)','Labour cost / vendor payout','Trip start / end, distance','Invoice ID / amount / status (incl. ₹0 FoC)'],c:'(Parts + labour + travel + vendor payout) ÷ tickets; FoC vs billable split (₹, lakh format)',r:'Weekly (Report 6)',o:['anil'],t:'Cost per ticket > budget (to set)',a:'Cost review with ASMs.'},
+ {g:'Management',n:'Quality and RCA',q:'What keeps failing and what are we penalised for?',f:['RCA code (picklist)','Repeat visit flag','Penalty / quality failure'],c:'Top RCA codes; repeat rate; penalties',r:'Weekly (Report 5)',o:['anil'],t:'Any penalty; repeat rising',a:'Quality review with action points.'}
+];
+function tcIdsStatic(){ return ['mrunal','vivek','rakhi','siddesh']; }
+</script>
+<script>
+/* =========================== STATE & HELPERS =========================== */
+const S={scen:'A',vol:{...VOL_DEFAULT},pmVar:'planned',calView:'week',calDay:todayIdx(),rDay:todayIdx(),shDay:todayIdx(),min:{},data:null,dataSynthetic:false,rFilter:'all',pFilter:'all',pWf:'all',kGroup:'all',fStatus:'all'};
+try{const s=JSON.parse(localStorage.getItem('circo_ops_bp')||'{}'); if(s.scen) S.scen=s.scen; if(s.vol) S.vol={...VOL_DEFAULT,...s.vol}; if(s.min) S.min=s.min;}catch(e){}
+function save(){try{localStorage.setItem('circo_ops_bp',JSON.stringify({scen:S.scen,vol:S.vol,min:S.min}))}catch(e){}}
+function todayIdx(){return (new Date().getDay()+6)%7}
+function nowH(){const n=new Date();return n.getHours()+n.getMinutes()/60}
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function hm(h){const H=Math.floor(h),M=Math.round((h-H)*60);return String(H).padStart(2,'0')+':'+String(M).padStart(2,'0')}
+function f1(x){return (Math.round(x*10)/10).toLocaleString('en-IN',{minimumFractionDigits:1,maximumFractionDigits:1})}
+function f0(x){return Math.round(x).toLocaleString('en-IN')}
+const P=id=>PEOPLE.find(p=>p.id===id);
+const inScen=p=>!p.scen||p.scen.includes(S.scen);
+const people=()=>PEOPLE.filter(inScen);
+const tcIds=()=>S.scen==='A'?TCA:TCB;
+function rosterCode(p,d){ if(!p||!p.roster) return null; const r=p.roster[S.scen]||p.roster.A; return r?r[d]:null; }
+function hasRoster(p){ return !!rosterCode(p,0); }
+function workdays(p){ let n=0; for(let d=0;d<7;d++){const c=rosterCode(p,d); if(c&&c!=='X') n++;} return n; }
+function breakFor(pid,d,code){
+  if(pid==='anil'){ const b=anilPlan(d).find(x=>x[3]==='break'); return b?[b[0],b[1]]:null; }
+  if(BREAK_OVERRIDE[pid]&&BREAK_OVERRIDE[pid][d]) return BREAK_OVERRIDE[pid][d];
+  return SHIFTS[code].brk;
+}
+function inShift(pid,d,t){ const p=P(pid); const c=rosterCode(p,d); if(!c||c==='X') return false; const s=SHIFTS[c]; return t>=s.s&&t<s.e; }
+function onDuty(pid,d,t){ if(!inShift(pid,d,t)) return false; const c=rosterCode(P(pid),d); const b=breakFor(pid,d,c); return !(b&&t>=b[0]&&t<b[1]); }
+function backupOf(pid){ const p=P(pid); if(!p||!p.backup) return null; const b=p.backup[S.scen]||p.backup.A; return b&&P(b)&&inScen(P(b))?b:(b==='cc'?'cc':null); }
+function initials(n){return n.replace(/[()]/g,'').split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()}
+function chip(id,opt={}){
+  if(id==='tcs') return tcIds().map(t=>chip(t,opt)).join(' ');
+  const p=P(id); if(!p) return `<span class="chip">${esc(id)}</span>`;
+  const cls=['chip']; if(p.vacant) cls.push('vac'); if(p.team) cls.push('team');
+  const out=!inScen(p)?' style="opacity:.5" title="Not in current scenario"':'';
+  return `<a class="${cls.join(' ')}" href="#person/${p.id}" onclick="event.stopPropagation()"${out}><span class="av" style="background:${p.vacant?'var(--p0)':p.color}">${initials(p.name)}</span>${esc(p.name)}${opt.role?` <span class="muted" style="font-weight:700">· ${esc(p.role)}</span>`:''}</a>`;
+}
+function chips(ids){ return (ids||[]).map(i=>chip(i)).join(' '); }
+function wfTag(w){ return w==='BD'||w==='bd'?'<span class="tagx t-bd">BD</span>':w==='PM'||w==='pm'?'<span class="tagx t-pm">PM</span>':'<span class="tagx t-both">BD + PM</span>'; }
+function srcTag(p){ return p.src==='org'?'<span class="tagx t-p1" title="Not in workbook">Org chart — confirm</span>':p.vacant?'<span class="tagx t-p0">Vacant / unnamed</span>':'<span class="tagx t-ok">Workbook</span>'; }
+function stepLink(wf,id){ const st=(wf==='bd'?BD_STEPS:PM_STEPS)[id]; if(!st) return ''; return `<a class="steplink ${wf}" href="#${wf}/${id}" onclick="event.stopPropagation()"><b>${wf.toUpperCase()} ${id}</b>${esc(st.act)}</a>`; }
+function ownerMatch(o,pid){ return o===pid || (o==='tcs'&&tcIds().includes(pid)); }
+
+/* =========================== SCHEDULING =========================== */
+function blocksFor(pid,d){
+  const p=P(pid); const code=rosterCode(p,d);
+  if(!code) return {none:true};
+  if(code==='X') return {off:true,code};
+  const sh=SHIFTS[code]; const out=[];
+  const add=(s,e,label,kind,extra)=>{ s=Math.max(s,sh.s); e=Math.min(e,sh.e); if(e<=s) return; if(out.some(b=>s<b.e&&e>b.s)) return; out.push(Object.assign({s,e,label,kind},extra||{})); };
+  if(pid==='anil'){ anilPlan(d).forEach(b=>add(b[0],b[1],b[2],b[3],{with:b[4]||[]})); return {code,blocks:out.sort((a,b)=>a.s-b.s)}; }
+  const br=breakFor(pid,d,code); add(br[0],br[1],'Break','break');
+  if(rosterCode(P('anil'),d)!=='X'){
+    anilPlan(d).forEach(b=>{
+      if(b[4]&&b[4].includes(pid)) add(b[0],b[1],'With Service Head — '+b[2].replace(/ with (JP|Pradeep|Rakesh)/,''),b[3]==='pm'?'pm':'mgmt');
+      (b[5]||[]).forEach(j=>{ if(j[2].includes(pid)) add(j[0],j[1],(b[3]==='esc'?'Escalated / delayed calls with Service Head (Report 3)':'Daily appointment and spare dispatch review — with ASM and Service Head (Report 1)'),b[3]==='esc'?'esc':'meeting'); });
+    });
+  }
+  roleFixed(pid,code,d).forEach(r=>add(r[0],r[1],r[2],r[3]));
+  if(code==='A'){ const bk=backupOf(pid); add(sh.e-.5,sh.e,'Handover to Shift B'+(bk&&bk!=='cc'?' ('+P(bk).name+')':''),'handover'); }
+  if(code==='B'){ add(sh.s,sh.s+.5,'Take handover and team huddle','handover'); add(sh.e-.5,sh.e,'Close-out and handover note for next morning','handover'); }
+  if(code==='G'){ add(sh.s,sh.s+.5,'Start-of-day queue review','handover'); }
+  // fill gaps
+  const wl=workFor(pid); let k=d; out.sort((a,b)=>a.s-b.s);
+  const gaps=[]; let t=sh.s; out.forEach(b=>{ if(b.s>t) gaps.push([t,b.s]); t=Math.max(t,b.e); }); if(t<sh.e) gaps.push([t,sh.e]);
+  const wk=(P(pid).wf==='PM'||['mrunal','vivek','rahul','rakhi','siddesh','imran','anuja'].includes(pid))?'pmwork':'work';
+  gaps.forEach(g=>{ let s=g[0]; while(g[1]-s>0.01){ const len=Math.min(1.5,g[1]-s); const e=(g[1]-(s+len)<0.5)?g[1]:s+len; out.push({s,e,label:wl[k%wl.length],kind:wk}); k++; s=e; } });
+  return {code,blocks:out.sort((a,b)=>a.s-b.s)};
+}
+function mgmtHours(pid){
+  let h=0; const p=P(pid); if(!p||!hasRoster(p)) return 0;
+  if(pid==='anil'){ for(let d=0;d<7;d++){ if(rosterCode(p,d)==='X') continue; anilPlan(d).forEach(b=>{ if(!['break','flex'].includes(b[3])) h+=b[1]-b[0]; }); } return h; }
+  for(let d=0;d<7;d++){ const r=blocksFor(pid,d); if(!r.blocks) continue; r.blocks.forEach(b=>{ if(b.label.indexOf('Service Head')>=0) h+=b.e-b.s; }); }
+  return h;
+}
+
+/* =========================== CAPACITY MODEL =========================== */
+function vol(){ const v=S.vol; const bd7=v.bd*7, fu7=bd7*v.fuPct/100, bill7=fu7*v.billPct/100, billok=bill7*v.agreePct/100; const pm7=v.pm*7;
+  return {bd:bd7,fu:fu7,bill:bill7,billok,esc:bill7-billok,foc:fu7-bill7,pm:pm7,pmfu:pm7*v.pmFuPct/100,fail:pm7*v.failPct/100}; }
+const VOLU=['bd','fu','bill','billok','esc','foc','pm','pmfu','fail'];
+function tmin(key,i){ const k=key+'|'+i; return S.min[k]!=null?S.min[k]:TASKS[key][i][2]; }
+function taskKey(pid){ if(pid==='siddesh'&&S.scen==='B') return 'siddeshB'; if(tcIds().includes(pid)) return 'tcs'; return pid; }
+function taskHrs(key,i,wd,share){ const t=TASKS[key][i]; const u=t[1]; const m=tmin(key,i); const V=vol();
+  if(u==='day'||u==='dayEach') return m*wd/60; if(u==='week') return m/60; if(u==='month') return m/60/4.33; return (V[u]||0)*m/60*share; }
+function capacityFor(pid){
+  const p=P(pid); if(!p||!hasRoster(p)||!inScen(p)) return null;
+  const v=S.vol, wd=workdays(p); const avail=wd*9, brk=wd*v.brk, meet=pid==='anil'?0:wd*v.meet, fixed=mgmtHours(pid);
+  const prod=avail-brk-meet-fixed; const items=[];
+  const key=taskKey(pid); const isTC=key==='tcs'; const n=tcIds().length;
+  const bk=backupOf(pid); const primShare=(bk&&bk!=='cc')?6/7:1;
+  (TASKS[key]||[]).forEach((t,i)=>{ const vu=VOLU.includes(t[1]); const share=isTC?(vu?1/n:1):(vu?primShare:1); const h=taskHrs(key,i,wd,share); items.push({label:t[0],unit:t[1],min:tmin(key,i),h,ref:t[3],key,i,share}); });
+  // backup load: cover others' volume tasks on their off day (1/7)
+  people().forEach(q=>{ if(q.id===pid) return; if(backupOf(q.id)!==pid) return; const qk=taskKey(q.id); if(qk==='tcs') return;
+    let h=0; (TASKS[qk]||[]).forEach((t,i)=>{ if(VOLU.includes(t[1])) h+=taskHrs(qk,i,0,1/7); });
+    if(h>0) items.push({label:'Backup cover for '+q.name+' on weekly off (1/7 of volume)',unit:'backup',min:null,h,ref:'roster',key:null}); });
+  const assigned=items.reduce((a,b)=>a+b.h,0);
+  return {wd,avail,brk,meet,fixed,prod,assigned,util:prod>0?assigned/prod:(assigned>0?9:0),items};
+}
+function ccHours(){ let h=0; TASKS.cc.forEach((t,i)=>h+=taskHrs('cc',i,6,1)); return h; }
+function ccFTE(){ return ccHours()/(54-6*S.vol.brk-6*S.vol.meet); }
+function techCap(){ const v=S.vol,V=vol(); const bdD=(V.bd+V.fu)*v.bdVisitMin/60, bdC=v.techBD*6*(9-v.brk); const pmD=(V.pm+V.pmfu)*v.pmVisitMin/60, pmC=v.pmTeams*6*(9-v.brk); return {bdD,bdC,pmD,pmC}; }
+function ustat(u){ if(u==null) return ['none','—']; if(u>1) return ['over','Over capacity']; if(u>=.85) return ['near','Near capacity']; return ['ok','Under capacity']; }
+function ubar(u,w){ const [c]=ustat(u); const pct=Math.min(u*100/1.5,100); return `<div class="bar" style="width:${w||160}px" title="${u==null?'':Math.round(u*100)+'%'}"><span class="u-${c}" style="width:${pct}%"></span><i class="cap" style="left:${100/1.5}%"></i></div>`; }
+
+/* =========================== COVERAGE =========================== */
+function covGroups(){ const B=S.scen==='B'; return [
+  {n:'Escalation authority',ids:['anil','jp','pradeep'],why:'Someone who can approve, escalate and decide must be on duty every hour.'},
+  {n:'BD Service Coordination',ids:B?['rakesh','shakeel','vishal']:['rakesh','shakeel'],why:'Appointment verification, technician supervision and follow-ups.'},
+  {n:'PM Technician Coordination',ids:tcIds(),why:'PM dispatch, technician follow-up and W/O closure.'},
+  {n:'Data entry (DEO)',ids:B?['karan','siddesh']:['karan'],why:'Ticket → Request → W/O → Appointment creation (CC co-owns).'},
+  {n:'BD ASM — JP only',ids:['jp'],why:'Primary-owner presence; backup is Pradeep.'},
+  {n:'PM ASM — Pradeep only',ids:['pradeep'],why:'Primary-owner presence; backup is JP.'},
+  {n:'Tools and spares',ids:['mahesh'],why:'Spare release after zero invoice / invoice (owner to confirm).'}
+];}
+function covCell(ids,d,t){ let r=0,n=0; ids.forEach(i=>{ if(inShift(i,d,t)) r++; if(onDuty(i,d,t)) n++; }); return {r,n}; }
+function covStats(ids){ let ok=0,brk=0,gap=0; for(let d=0;d<7;d++) for(let t=WIN.s;t<WIN.e;t+=.5){ const c=covCell(ids,d,t); if(c.n>0) ok++; else if(c.r>0) brk++; else gap++; } return {ok,brk,gap,pct:ok/168,gapH:gap/2,brkH:brk/2}; }
+function heatmap(ids){
+  let h=`<div class="heat"><div></div>`; for(let t=WIN.s;t<WIN.e;t+=.5) h+=`<div class="hh">${t%1===0?hm(t).slice(0,2):''}</div>`;
+  for(let d=0;d<7;d++){ h+=`<div class="hl">${DAYS[d]}</div>`; for(let t=WIN.s;t<WIN.e;t+=.5){ const c=covCell(ids,d,t); const cls=c.r===0?'c0':c.n===0?'cbrk':c.n===1?'c1':c.n===2?'c2':'c3'; const who=ids.filter(i=>onDuty(i,d,t)).map(i=>P(i).name).join(', ')||(c.r?'All rostered staff on break':'Nobody rostered');
+    h+=`<div class="hc ${cls}" title="${DAYS[d]} ${hm(t)}–${hm(t+.5)}: ${esc(who)}">${c.n||(c.r?'b':'×')}</div>`; } }
+  return h+'</div>';
+}
+</script>
+<script>
+/* =========================== ROUTER =========================== */
+const PAGES=[['home','Home'],['bd','BD Workflow'],['pm','PM Workflow'],['people','Roles & People'],['roster','7-Day Roster'],['sh','Service Head Schedule'],['live','Live Workload'],['kpi','KPI Dashboard'],['data','Zoho FSM Data Model'],['risks','Risks / Decisions / Questions']];
+function go(h){ location.hash='#'+h; }
+function route(){
+  const h=(location.hash||'#home').slice(1); const [pg,arg]=h.split('/');
+  const page=PAGES.find(x=>x[0]===pg)?pg:(pg==='person'?'person':'home');
+  $('#nav').innerHTML=PAGES.map((x,i)=>`<a href="#${x[0]}" class="${(x[0]===page||(page==='person'&&x[0]==='people'))?'on':''}"><span class="ix">${i+1}</span>${x[1]}</a>`).join('');
+  const crumbs=['<a href="#home">Home</a>']; const title=PAGES.find(x=>x[0]===page);
+  if(page==='person'){ crumbs.push('<a href="#people">Roles & People</a>'); const p=P(arg); crumbs.push(esc(p?p.name:arg)); }
+  else if(page!=='home'){ crumbs.push(title[1]); if(arg) crumbs.push('Step '+esc(arg)); }
+  $('#crumbs').innerHTML=crumbs.join('<span class="sep">/</span>');
+  closeDrawer(true);
+  const R={home:pgHome,bd:()=>pgFlow('bd'),pm:()=>pgFlow('pm'),people:pgPeople,person:()=>pgPerson(arg),roster:pgRoster,sh:pgSH,live:pgLive,kpi:pgKPI,data:pgData,risks:pgRisks}[page];
+  $('#page').innerHTML=R(); window.scrollTo(0,0);
+  if((page==='bd'||page==='pm')&&arg) setTimeout(()=>openStep(page,arg),30);
+  afterRender(page);
+  $('#scA').classList.toggle('on',S.scen==='A'); $('#scB').classList.toggle('on',S.scen==='B');
+  $('#scenNote').textContent=S.scen==='A'?'Only people named in the workbook.':'Adds Vishal, Imran, Rahul (for Vivek) and Siddesh as PM DEO — confirm before use.';
+}
+function setScen(s){ S.scen=s; save(); route(); }
+window.addEventListener('hashchange',route);
+function afterRender(page){ if(page==='live') renderLiveBoard(); }
+
+/* =========================== DRAWER =========================== */
+function openStep(wf,id){
+  const st=(wf==='bd'?BD_STEPS:PM_STEPS)[id]; if(!st) return;
+  $('#dhead').innerHTML=`<div><span class="tagx ${wf==='bd'?'t-bd':'t-pm'}">${wf.toUpperCase()} step ${esc(id)}</span><h2 style="margin-top:6px">${esc(st.act)}</h2></div><button class="xbtn" onclick="closeDrawer()" aria-label="Close">×</button>`;
+  const flags=(st.flags||[]).map(f=>`<div class="issue ${f[0]}" style="margin-top:8px"><span class="pr">${f[0].toUpperCase()}</span><div class="small">${esc(f[1])}</div></div>`).join('');
+  const subs=st.subs?`<h4 class="mt">Field sub-steps and FSM evidence</h4><div class="tblwrap mt"><table class="tbl"><tr><th>Step</th><th>Activity</th><th>FSM evidence</th></tr>${st.subs.map(s=>`<tr><td><b>${s[0]}</b></td><td>${esc(s[1])}</td><td class="small">${esc(s[2])}</td></tr>`).join('')}</table></div>`:'';
+  const owners=st.o.map(o=>chip(o)).join(' ');
+  const kp=DASH.filter(x=>(wf==='bd'?x.g==='BD':x.g==='PM')&&x.o.some(o=>st.o.some(so=>ownerMatch(so,o)||so===o))).slice(0,4);
+  $('#dbody').innerHTML=`<dl>
+    <dt>Owner</dt><dd>${owners}</dd>
+    <dt>Supporting</dt><dd>${st.sup.length?chips(st.sup):'<span class="muted">—</span>'}</dd>
+    <dt>Target / SLA</dt><dd>${st.sla?`<span class="tagx t-sla">${esc(st.sla)}</span>`:'<span class="muted">Not specified in workbook</span>'}</dd>
+    <dt>Output</dt><dd>${esc(st.out)}</dd>
+    <dt>Next step</dt><dd>${st.next.length?st.next.map(n=>stepLink(wf,n)).join(''):'<span class="tagx t-ok">End — ticket / request closed</span>'}</dd>
+    <dt>Escalation</dt><dd>${esc(st.esc)}</dd>
+    <dt>Zoho FSM</dt><dd class="small">${esc(st.fsm)}</dd>
+    ${st.report?`<dt>Report</dt><dd><span class="tagx t-grey">${esc(st.report)}</span></dd>`:''}
+    ${st.variantNote?`<dt>Variant</dt><dd class="small">${esc(st.variantNote)}</dd>`:''}
+    <dt>Workbook text</dt><dd class="small muted">${esc(st.raw)}</dd>
+  </dl>${flags}${subs}
+  ${kp.length?`<h4 class="mt">Dashboards that watch this step</h4><div class="small">${kp.map(k=>`<a href="#kpi" onclick="closeDrawer()">${esc(k.n)}</a>`).join(' · ')}</div>`:''}
+  <h4 class="mt">Owner workload</h4><div class="row mt">${st.o.map(o=>o==='tcs'?tcIds().map(t=>`<a class="pillbtn sm" href="#person/${t}">${P(t).name}’s page</a>`).join(''):`<a class="pillbtn sm" href="#person/${o}">${esc(P(o).name)}’s page</a>`).join('')}</div>`;
+  $('#drawer').classList.add('open'); $('#scrim').classList.add('open');
+  document.querySelectorAll('.node').forEach(n=>n.classList.toggle('hit',n.dataset.step===id&&n.dataset.wf===wf));
+}
+function closeDrawer(silent){ $('#drawer').classList.remove('open'); $('#scrim').classList.remove('open'); if(!silent){ const h=location.hash.split('/'); if(h.length>1&&(h[0]==='#bd'||h[0]==='#pm')) history.replaceState(null,'',h[0]); document.querySelectorAll('.node.hit').forEach(n=>n.classList.remove('hit')); } }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer(); if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){ e.preventDefault(); $('#q').focus(); } });
+
+/* =========================== HOME =========================== */
+function nowPanel(){
+  const d=todayIdx(), t=nowH(); const inWin=t>=WIN.s&&t<WIN.e;
+  const ps=people().filter(p=>hasRoster(p));
+  const on=ps.filter(p=>onDuty(p.id,d,t)), brk=ps.filter(p=>inShift(p.id,d,t)&&!onDuty(p.id,d,t)), off=ps.filter(p=>rosterCode(p,d)==='X');
+  const escBD=['jp','anil','pradeep'].find(i=>onDuty(i,d,t)), escPM=['pradeep','anil','jp'].find(i=>onDuty(i,d,t));
+  const ab=blocksFor('anil',d); const cur=ab.blocks?ab.blocks.find(b=>t>=b.s&&t<b.e):null;
+  const nextHo=[11,17,20].find(x=>x>t);
+  return `<div class="now">
+    <div class="clock"><div class="t num" id="clk">${hm(t)}</div><div class="d">${DAYSL[d]}</div><span class="w" style="background:${inWin?'#D0F0C0':'#F7D3CF'};color:${inWin?'#1F4F1E':'#8A1A12'}">${inWin?'Inside coverage window':'Outside 08:00–20:00'}</span><div class="tiny" style="color:#CDBEDA;margin-top:8px">Proposed roster · scenario ${S.scen==='A'?'Workbook':'+ Org chart'}</div></div>
+    <div class="nowgrid">
+      <div class="nowcard"><h4>On duty now (${on.length})</h4><div class="chips">${on.map(p=>chip(p.id)).join('')||'<span class="muted small">Nobody — outside rostered hours</span>'}</div></div>
+      <div class="nowcard"><h4>On break · off today</h4><div class="chips">${brk.map(p=>chip(p.id)).join('')}${off.map(p=>chip(p.id)).join('')||''}</div><div class="tiny muted" style="margin-top:6px">${brk.length?brk.length+' on break · ':''}${off.length} on weekly off</div></div>
+      <div class="nowcard"><h4>Escalation owner now</h4><div class="chips"><span class="tagx t-bd">BD</span> ${escBD?chip(escBD):'<span class="tagx t-p0">None on duty</span>'}</div><div class="chips" style="margin-top:6px"><span class="tagx t-pm">PM</span> ${escPM?chip(escPM):'<span class="tagx t-p0">None on duty</span>'}</div></div>
+      <div class="nowcard" style="grid-column:span 2"><h4>Service Head should be doing</h4><div style="font-weight:800">${ab.off?'Weekly off — duty ASMs hold escalation authority':cur?esc(cur.label):'Outside Service Head hours'}</div>${cur?`<div class="tiny muted">${hm(cur.s)}–${hm(cur.e)} · <a href="#sh">open Service Head schedule</a></div>`:''}</div>
+      <div class="nowcard"><h4>Next handover</h4><div style="font-weight:800">${nextHo?hm(nextHo===11?11:nextHo-.5)+' — '+(nextHo===11?'Shift B joins; huddle':nextHo===17?'Shift A → Shift B':'Evening close-out note'):'Tomorrow 08:00 — Shift A start'}</div></div>
+    </div></div>`;
+}
+function pgHome(){
+  const p0=ISSUES.filter(i=>i.pr==='p0').length, p1=ISSUES.filter(i=>i.pr==='p1').length;
+  const G=covGroups(); const named=people().filter(p=>!p.team&&!p.vacant).length;
+  const bdN=Object.keys(BD_STEPS).length, pmN=Object.keys(PM_STEPS).length;
+  const cards=PAGES.slice(1).map((x,i)=>`<a class="navcard" href="#${x[0]}"><div class="n">${i+2}. ${x[1]}</div><p>${['Breakdown lifecycle from ticket raise to follow-up, billable and escalation paths.','Preventive-maintenance lifecycle, planned and ticket variants, machine-failure path.','Every named person and role, with owned steps, KPIs and capacity.','Shift A / B / General, weekly offs, coverage heatmaps, backups.','Anil’s daily operating rhythm and the capacity question it raises.','Capacity model with editable volumes, plus a live board fed by an FSM export.','Dashboard catalogue with Zoho FSM fields, formulas, owners and thresholds.','Data dictionary: which Desk / FSM / Books fields feed each KPI.','P0 / P1 / P2 issues, assumptions, roadmap and the field list needed.'][i]}</p></a>`).join('');
+  return `<div class="banner draft mb"><b>Draft v1 — not yet a valid schedule.</b> ${p0} P0 questions must be answered before the roster can be adopted. All shift times, volumes and task durations are labelled assumptions. <a href="#risks">Review P0 questions</a></div>
+  <section class="hero"><h1>Mumbai service operations blueprint</h1>
+    <p class="lede">One operating model for Breakdown (BD) and Preventive Maintenance (PM): who owns each step, who is on duty, who backs them up, and which Zoho FSM data proves it. Built from <b>Workflow_Improved.xlsx</b>.</p>
+    ${nowPanel()}
+  </section>
+  <div class="grid g4 mt2">
+    <div class="stat"><div class="v num">${bdN}<span class="small muted"> + 7 sub</span></div><div class="l">BD workflow steps</div></div>
+    <div class="stat"><div class="v num">${pmN}</div><div class="l">PM workflow steps</div></div>
+    <div class="stat"><div class="v num">${named}</div><div class="l">Named people in scenario (+ CC, technicians, vendors)</div></div>
+    <div class="stat bad"><div class="v num">${p0}</div><div class="l">P0 decisions open · ${p1} P1</div></div>
+  </div>
+  <div class="sechead"><h2>Operating model</h2><span class="note">Two workflows, one escalation spine</span></div>
+  <div class="grid g2">
+    <div class="panel" style="border-top:5px solid var(--purple)"><div class="row">${wfTag('BD')}<h3>Breakdown — reactive</h3></div>
+      <p class="small">CC raises the ticket and confirms the slot; CC + DEO create Request → W/O → Appointment. <b>SC1 Rakesh</b> owns the first visit to <b>T+1 for 90%</b>. <b>SC2 Shakeel</b> owns follow-ups to <b>T+2</b>, including spares and FoC. Billable cases go to <b>ASM JP</b> (T+4). Disagreements escalate to an ASM listed as “New”.</p>
+      <div class="row small">${chips(['cc','karan','rakesh','shakeel','jp','asm_new','tech_bd'])}</div></div>
+    <div class="panel" style="border-top:5px solid var(--blue-d)"><div class="row">${wfTag('PM')}<h3>Preventive maintenance — planned</h3></div>
+      <p class="small">Monthly plan from FSM or GSheet (<b>ASM Pradeep</b>, Anil, Anuja). CC confirms slots; request creation is marked for elimination and W/O creation for automation. <b>Technician Coordinators</b> dispatch, follow up and close. Machine failures route to <b>BD SC2 Shakeel</b>. Pradeep verifies final closure.</p>
+      <div class="row small">${chips(['pradeep','anuja','cc'])} ${chip('tcs')} ${chips(['shakeel','tech_pm'])}</div></div>
+  </div>
+  <div class="grid g2 mt">
+    <div class="panel"><h3>7-day × 12-hour coverage status</h3><p class="small muted">Share of the 168 half-hour slots per week (08:00–20:00) with at least one person on duty (breaks excluded).</p>
+      ${G.map(g=>{const s=covStats(g.ids);const c=s.pct>=.999?'ok':s.pct>=.9?'near':'over';return `<div class="row" style="margin:9px 0;justify-content:space-between"><div style="min-width:190px;font-weight:800;font-size:13.5px">${esc(g.n)}</div><div class="bar" style="flex:1;min-width:120px"><span class="u-${c}" style="width:${s.pct*100}%"></span></div><div class="num small" style="width:150px;text-align:right"><b>${Math.round(s.pct*100)}%</b> · gap ${f1(s.gapH)} h · break ${f1(s.brkH)} h</div></div>`}).join('')}
+      <div class="row small" style="justify-content:space-between;margin-top:9px"><div style="font-weight:800">Contact Centre</div><span class="tagx t-p0">Headcount not provided — cannot compute</span></div>
+      <a class="pillbtn sm mt" href="#roster">Open roster and heatmaps</a></div>
+    <div class="panel"><h3>Staffing assumptions in use</h3>
+      <div class="tblwrap mt"><table class="tbl">
+      <tr><th>Item</th><th>Value used</th><th>Source</th></tr>
+      <tr><td>Coverage window</td><td>08:00–20:00, 7 days</td><td><span class="tagx t-p1">Assumption</span></td></tr>
+      <tr><td>Shifts</td><td>A 08–17 · B 11–20 · General 09:30–18:30 · 1 h break inside</td><td><span class="tagx t-p1">Assumption</span></td></tr>
+      <tr><td>Individual limit</td><td>6 days × ~9 h, one weekly off</td><td><span class="tagx t-ok">Brief</span></td></tr>
+      <tr><td>Service Head fixed time</td><td>2.5 h BD ASM + 1.5 h PM ASM + 2 h escalations</td><td><span class="tagx t-ok">Brief</span></td></tr>
+      <tr><td>BD technicians</td><td>26 (Rakesh 16, Shakeel 6+4)</td><td><span class="tagx t-ok">Workbook</span></td></tr>
+      <tr><td>PM vendor teams</td><td>${S.vol.pmTeams}</td><td><span class="tagx t-p1">Org chart — confirm</span></td></tr>
+      <tr><td>Volumes and minutes</td><td>${S.vol.bd} BD/day · ${S.vol.pm} PM/day</td><td><span class="tagx t-p0">Placeholder</span></td></tr>
+      </table></div></div>
+  </div>
+  <div class="sechead"><h2>Important alerts</h2><a class="note" href="#risks">All issues</a></div>
+  ${ISSUES.filter(i=>i.pr==='p0').slice(0,4).map(issueHTML).join('')}
+  <div class="sechead"><h2>Key KPIs and owners</h2></div>
+  <div class="tblwrap"><table class="tbl"><tr><th>KPI</th><th>Target</th><th>Owner</th><th>Watched by</th></tr>
+   <tr><td>BD first visit within T+1</td><td><span class="tagx t-sla">90% of tickets</span></td><td>${chip('rakesh')}</td><td>BD ageing · BD SLA compliance</td></tr>
+   <tr><td>BD follow-up visit within T+2</td><td><span class="tagx t-sla">T+2 (% to set)</span></td><td>${chip('shakeel')}</td><td>Follow-up tracker</td></tr>
+   <tr><td>Billable discussion within T+4</td><td><span class="tagx t-sla">T+4 (% to set)</span></td><td>${chip('jp')}</td><td>Billable discussion</td></tr>
+   <tr><td>PM plan vs completion</td><td><span class="muted">Not in workbook</span></td><td>${chip('pradeep')}</td><td>PM plan vs actual (PM Report 4)</td></tr>
+   <tr><td>Repeat issue / quality failure</td><td><span class="muted">Not in workbook</span></td><td>${chip('anil')}</td><td>Quality and RCA (Report 5)</td></tr>
+   <tr><td>Cost per ticket</td><td><span class="muted">Not in workbook</span></td><td>${chip('anil')}</td><td>Cost per service (Report 6)</td></tr>
+  </table></div>
+  <div class="sechead"><h2>Navigate</h2></div>
+  <div class="grid g3">${cards}</div>
+  <div class="sechead"><h2>Legend</h2></div>
+  <div class="panel"><div class="legend">
+    <span><span class="tagx t-bd">BD</span> Breakdown</span><span><span class="tagx t-pm">PM</span> Preventive maintenance</span>
+    <span><span class="sc A">A</span> Shift A 08:00–17:00</span><span><span class="sc B">B</span> Shift B 11:00–20:00</span><span><span class="sc G">G</span> General 09:30–18:30</span><span><span class="sc X">off</span> Weekly off</span>
+    <span><span class="tagx t-p0">P0</span> must resolve before schedule is valid</span><span><span class="tagx t-p1">P1</span> resolve before implementation</span><span><span class="tagx t-p2">P2</span> handled as assumption</span>
+    <span><span class="tagx t-ok">Workbook</span> from Excel</span><span><span class="tagx t-p1">Org chart — confirm</span> outside workbook</span><span><span class="tagx t-sla">T+1</span> SLA from workbook</span>
+  </div></div>`;
+}
+function issueHTML(i){ let d=i.d.replace('{CCFTE}',f1(ccFTE())); return `<div class="issue ${i.pr}"><span class="pr">${i.id}</span><h4>${esc(i.t)}</h4><div class="small">${esc(d)}</div>${i.q?`<div class="q small">Question: ${esc(i.q)}</div>`:''}${i.link?`<div class="tiny"><a href="#${i.link}">Go to related page</a></div>`:''}</div>`; }
+
+/* =========================== WORKFLOW PAGES =========================== */
+function nodeHTML(wf,id){
+  const st=(wf==='bd'?BD_STEPS:PM_STEPS)[id]; const fl=(st.flags||[]); const f=fl.find(x=>x[0]==='p0')||fl[0];
+  const names=st.o.map(o=>o==='tcs'?tcIds().map(t=>P(t).name).join(' '):P(o).name).join(' ');
+  return `<div class="node" tabindex="0" data-wf="${wf}" data-step="${id}" data-own="${st.o.join(' ')} ${st.o.includes('tcs')?tcIds().join(' '):''}" data-txt="${esc((st.act+' '+names+' '+st.fsm+' '+st.sla).toLowerCase())}" onclick="stepClick('${wf}','${id}')" onkeydown="if(event.key==='Enter')stepClick('${wf}','${id}')">
+    ${f?`<span class="flag ${f[0]}" title="${esc(f[1])}">!</span>`:''}
+    <div class="top1"><span class="stp">${id}</span>${st.sla?`<span class="tagx t-sla" style="font-size:10.5px">${esc(st.sla.split(' ')[0].replace('Within','')||'SLA')}</span>`:''}</div>
+    <div class="act">${esc(st.act)}</div>
+    ${st.subs?`<div class="tiny muted">7A–7G: trip, work, asset, job sheet</div>`:''}
+    <div class="own">${st.o.map(o=>chip(o)).join('')}</div></div>`;
+}
+const AR='<div class="arrow" aria-hidden="true">›</div>';
+function chainHTML(wf,ids){ return ids.map((id,i)=>nodeHTML(wf,id)+(i<ids.length-1?AR:'')).join(''); }
+function pgFlow(wf){
+  const isBD=wf==='bd'; const stages=isBD?BD_STAGES:PM_STAGES; const gov=isBD?BD_GOV:PM_GOV;
+  const visible=id=>{ if(isBD) return true; const v=PM_STEPS[id].variants; return !v||v[S.pmVar]; };
+  const owners=[...new Set(Object.values(isBD?BD_STEPS:PM_STEPS).flatMap(s=>s.o.flatMap(o=>o==='tcs'?tcIds():[o])))];
+  let html=`<div class="phead"><div><h1>${isBD?'BD workflow — Breakdown ticket':'PM workflow — Scheduled / planned maintenance'}</h1><p class="sub">${isBD?'Every step from ticket raise to closure, including the follow-up, FoC, billable and escalation paths. Select a step for owner, SLA, output, next step, escalation and Zoho FSM object.':'Every step from monthly plan to ASM-verified closure. The workbook has two variants: Planned PM and PM Ticket. Select a step for details.'}</p></div></div>
+  <div class="flowtools noprint">
+    <input id="ff" type="search" placeholder="Filter steps (e.g. RCA, invoice, Rakesh)" oninput="flowFilter()">
+    <select class="sel" id="fo" onchange="flowFilter()"><option value="">All owners</option>${owners.map(o=>`<option value="${o}">${esc(P(o).name)}</option>`).join('')}</select>
+    ${!isBD?`<span class="tabs" style="margin:0"><button class="pillbtn sm ${S.pmVar==='planned'?'on':''}" onclick="S.pmVar='planned';route()">Planned PM</button><button class="pillbtn sm ${S.pmVar==='ticket'?'on':''}" onclick="S.pmVar='ticket';route()">PM Ticket</button></span>`:''}
+    <button class="pillbtn sm" onclick="document.querySelectorAll('.stage').forEach(s=>s.classList.remove('closed'))">Expand all</button>
+    <button class="pillbtn sm" onclick="document.querySelectorAll('.stage').forEach(s=>s.classList.add('closed'))">Collapse all</button>
+    <span class="legend" style="margin-left:auto"><span><span class="flag" style="position:static;display:inline-grid;width:16px;height:16px;background:var(--p0);color:#fff;border-radius:50%;font-size:10px;place-items:center">!</span> P0 issue</span><span><span style="display:inline-grid;width:16px;height:16px;background:var(--amber);color:#fff;border-radius:50%;font-size:10px;place-items:center">!</span> P1 issue</span></span>
+  </div><div class="${wf}">`;
+  stages.forEach((sg,si)=>{
+    if(sg.variant&&sg.variant!==S.pmVar) return;
+    const ids=sg.steps.filter(visible);
+    html+=`<section class="stage" id="stg-${sg.k}"><header onclick="this.parentElement.classList.toggle('closed')"><span class="sno">${si+1}</span><div><h3>${esc(sg.n)}</h3><div class="lane">${esc(sg.lane)}</div></div><span class="tog">▾</span></header><div class="stagebody">${chainHTML(wf,ids)}`;
+    if(sg.decision){ html+=AR+`<div class="node decision"><div class="top1"><span class="stp" style="background:#FFF1D6;color:#8A5300">${sg.decision.id}</span></div><div class="act">${esc(sg.decision.q)}</div><div class="tiny"><b>No</b> → ${esc(sg.decision.no)}<br><b>Yes</b> → ${esc(sg.decision.yes)}</div></div>`; }
+    if(sg.branches){ html+=`<div class="branches">${sg.branches.map(b=>`<div class="branch"><h4>${esc(b.h)}</h4><div class="chain">${b.chain.length?chainHTML(wf,b.chain.filter(visible)):'<div class="node term"><div class="act">Continue to closure</div><div class="tiny muted">Go to stage ${stages.length}</div></div>'}</div></div>`).join('')}</div>`; }
+    if(sg.end) html+=AR+`<div class="node term"><div class="act">${esc(sg.end)}</div></div>`;
+    html+=`</div></section>`;
+    if(si<stages.length-1) html+=`<div class="vlink" aria-hidden="true">⌄</div>`;
+  });
+  html+=`</div>`;
+  if(isBD) html+=`<div class="panel mt"><h3>Routing notes</h3><ul class="clean small"><li>FoC path: 13 → 14 → 17. Billable path: 13 → 15 → 16 → 17 (customer agrees and pays). Disagreement: 15 → 23 → 24, where the ASM runs steps 14 to 20 personally.</li><li>Steps 19 and 7 are the same field routine (7A–7G) and produce the Trips, timesheet, asset and job-sheet evidence the dashboards rely on.</li><li>Targets written in the workbook’s responsibility column apply to the step groups beside them: SC1 T+1 for 90% (steps 4–10), SC2 T+2 for follow-up visit (11–22), SC3 T+4 for billable discussion (15–16, 23–24).</li></ul></div>`;
+  else html+=`<div class="panel mt"><h3>Automation opportunity in Zoho FSM</h3><p class="small">The workbook marks PM step 3 “Eliminate (CC)” and step 4 “Auto”. Zoho FSM Scheduled Maintenance can generate PM work orders from a maintenance plan per asset, removing manual request creation and making <b>PM planned</b> and <b>PM due</b> directly measurable. Until then PM 1 data comes from FSM or GSheet and must be reconciled manually. Confirm your FSM edition supports this before relying on it.</p></div>`;
+  html+=`<div class="sechead"><h2>${isBD?'BD':'PM'} governance, reviews and administration</h2><span class="note">From the lower sections of the ${isBD?'BD Ticket':'PM ScheduledTicket'} sheet</span></div>`;
+  gov.forEach(g=>{ html+=`<div class="panel"><h3>${esc(g.g)}</h3><div class="tblwrap mt"><table class="tbl"><tr><th>Activity</th><th>Position (workbook)</th><th>Person (workbook)</th><th>Mapped to</th><th>Report / cadence</th></tr>${g.rows.map(r=>`<tr><td>${esc(r[0])}${r[5]?` <span class="tagx t-${r[5]}">${r[5].toUpperCase()}</span>`:''}</td><td class="small">${esc(r[1])}</td><td class="small muted">${esc(r[2])}</td><td>${chips(r[3])}</td><td class="small">${esc(r[4])||'<span class="muted">—</span>'}</td></tr>`).join('')}</table></div></div>`; });
+  return html;
+}
+function flowFilter(){ const q=($('#ff').value||'').toLowerCase().trim(), o=$('#fo').value; document.querySelectorAll('.node[data-step]').forEach(n=>{ const m=(!q||n.dataset.txt.includes(q))&&(!o||n.dataset.own.split(' ').includes(o)); n.classList.toggle('dim',!m); }); }
+</script>
+<script>function stepClick(wf,id){ history.replaceState(null,'','#'+wf+'/'+id); openStep(wf,id); }</script>
+<script>
+/* =========================== PEOPLE =========================== */
+function ownedSteps(pid){ const r={bd:[],pm:[],bdSup:[],pmSup:[]};
+  Object.entries(BD_STEPS).forEach(([k,s])=>{ if(s.o.some(o=>ownerMatch(o,pid))) r.bd.push(k); else if(s.sup.some(o=>ownerMatch(o,pid))) r.bdSup.push(k); });
+  Object.entries(PM_STEPS).forEach(([k,s])=>{ if(s.o.some(o=>ownerMatch(o,pid))) r.pm.push(k); else if(s.sup.some(o=>ownerMatch(o,pid))) r.pmSup.push(k); });
+  return r; }
+function govFor(pid){ const out=[]; [['BD',BD_GOV],['PM',PM_GOV]].forEach(([w,G])=>G.forEach(g=>g.rows.forEach(r=>{ if(r[3].some(o=>ownerMatch(o,pid))) out.push({w,a:r[0],rep:r[4],grp:g.g}); }))); return out; }
+function cadence(x){ const s=(x.rep+' '+x.a).toLowerCase(); if(s.includes('monthly')) return 'Monthly'; if(s.includes('weekly')) return 'Weekly'; if(s.includes('daily')) return 'Daily'; return 'Ongoing / as required'; }
+function pgPeople(){
+  const grps=['Management','Coordination','Intake','Support','Field'];
+  let list=people().filter(p=>(S.pFilter==='all'||p.grp===S.pFilter)&&(S.pWf==='all'||p.wf===S.pWf||p.wf==='Both'));
+  const card=p=>{ const o=ownedSteps(p.id); const c=capacityFor(p.id); const st=c?ustat(c.util):null; return `<div class="pcard" onclick="go('person/${p.id}')" tabindex="0" onkeydown="if(event.key==='Enter')go('person/${p.id}')">
+    <div class="nm"><span class="bigav" style="background:${p.vacant?'var(--p0)':p.color}">${initials(p.name)}</span><div>${esc(p.name)}<div class="small muted" style="font-weight:700">${esc(p.role)}</div></div></div>
+    <div class="row">${wfTag(p.wf)} ${srcTag(p)}</div>
+    <div class="small muted">Owns ${o.bd.length} BD · ${o.pm.length} PM steps${p.reportsTo?` · reports to ${esc(P(p.reportsTo).name)}`:''}</div>
+    ${c?`<div class="row small">${ubar(c.util,120)} <b class="num">${Math.round(c.util*100)}%</b> <span class="muted">${st[1]}</span></div>`:`<div class="small muted">${p.team?'Team — see page':'No roster (vacant)'}</div>`}
+  </div>`; };
+  const modelRows=people().map(p=>{ const o=ownedSteps(p.id); return `<tr class="click" onclick="go('person/${p.id}')"><td>${chip(p.id)}</td><td class="small">${esc(p.role)}</td><td>${o.bd.map(s=>`<a class="steplink bd" href="#bd/${s}" onclick="event.stopPropagation()"><b>${s}</b></a>`).join('')||'<span class="muted">—</span>'}</td><td>${o.pm.map(s=>`<a class="steplink pm" href="#pm/${s}" onclick="event.stopPropagation()"><b>${s}</b></a>`).join('')||'<span class="muted">—</span>'}</td><td class="small">${govFor(p.id).length}</td><td class="small">${p.reportsTo?esc(P(p.reportsTo).name):'—'}</td></tr>`; }).join('');
+  return `<div class="phead"><div><h1>Roles and people</h1><p class="sub">Every person and role that appears in the workbook, normalised. Combined strings such as “Mrunal/Vivek/Rakhi/Siddesh” are treated as four individuals sharing a step; “CC”, “Technician” and “Warehouse” are roles without named people.</p></div></div>
+  <div class="flowtools noprint"><span class="small muted" style="font-weight:800">Role group</span>${['all'].concat(grps).map(g=>`<button class="pillbtn sm ${S.pFilter===g?'on':''}" onclick="S.pFilter='${g}';route()">${g==='all'?'All':g}</button>`).join('')}
+   <span class="small muted" style="font-weight:800;margin-left:10px">Workflow</span>${['all','BD','PM'].map(g=>`<button class="pillbtn sm ${S.pWf===g?'on':''}" onclick="S.pWf='${g}';route()">${g==='all'?'All':g}</button>`).join('')}</div>
+  ${grps.filter(g=>list.some(p=>p.grp===g)).map(g=>`<div class="sechead"><h2>${g}</h2></div><div class="grid g4">${list.filter(p=>p.grp===g).map(card).join('')}</div>`).join('')}
+  <div class="sechead"><h2>Normalised role / activity model</h2><span class="note">Owned workflow steps per person; select a step or row</span></div>
+  <div class="tblwrap"><table class="tbl"><tr><th>Person / role</th><th>Position</th><th>BD steps owned</th><th>PM steps owned</th><th>Review / admin items</th><th>Reports to</th></tr>${modelRows}</table></div>`;
+}
+
+/* =========================== CALENDAR =========================== */
+const HPX=44;
+function calendarHTML(pid,view,day){
+  const p=P(pid); const days=view==='day'?[day]:[0,1,2,3,4,5,6];
+  let h=`<div class="cal ${view==='day'?'one':''}"><div class="ch" style="border-left:0"></div>`;
+  days.forEach(d=>{ const c=rosterCode(p,d); h+=`<div class="ch">${DAYSL[d].slice(0,view==='day'?9:3)}<small>${c==='X'?'Weekly off':c?SHIFTS[c].name+' · '+SHIFTS[c].time:'—'}</small></div>`; });
+  const H=(WIN.e-WIN.s)*HPX;
+  h+=`<div class="tcol" style="height:${H}px">${Array.from({length:13},(_,i)=>`<span style="top:${i*HPX}px">${i===0?'':hm(WIN.s+i)}</span>`).join('')}</div>`;
+  days.forEach(d=>{
+    h+=`<div class="dcol" style="height:${H}px">${Array.from({length:12},(_,i)=>`<div class="hline" style="top:${i*HPX}px"></div>`).join('')}`;
+    const r=blocksFor(pid,d);
+    if(r.off){ const bk=backupOf(pid); h+=`<div class="offday">Weekly off${bk?`<br><span class="tiny">Backup: ${bk==='cc'?'CC':esc(P(bk).name)}</span>`:''}<br><span class="tiny">KPI stays with ${esc(p.name)}</span></div>`; }
+    else if(r.blocks){ r.blocks.forEach(b=>{ const top=(b.s-WIN.s)*HPX, ht=(b.e-b.s)*HPX-2; h+=`<div class="cb k-${b.kind}" style="top:${top}px;height:${ht}px" title="${hm(b.s)}–${hm(b.e)} · ${esc(b.label)}"><b class="num">${hm(b.s)}</b> ${esc(b.label)}</div>`; }); }
+    if(d===todayIdx()){ const t=nowH(); if(t>=WIN.s&&t<WIN.e) h+=`<div class="nowline" style="left:0;right:0;width:auto;height:2px;top:${(t-WIN.s)*HPX}px"></div>`; }
+    h+='</div>';
+  });
+  return h+'</div>';
+}
+const CAL_LEGEND=`<div class="legend mt"><span><i class="k-work"></i>Workflow work (BD)</span><span><i class="k-pmwork"></i>Workflow work (PM)</span><span><i class="k-mgmt"></i>With Service Head (BD)</span><span><i class="k-pm"></i>With Service Head (PM)</span><span><i class="k-esc"></i>Escalations</span><span><i class="k-meeting"></i>Review meeting</span><span><i class="k-handover"></i>Handover</span><span><i class="k-report"></i>Reporting / discipline</span><span><i class="k-flex"></i>Service Head analysis</span><span><i class="k-break"></i>Break</span></div>`;
+
+/* =========================== PERSON PAGE =========================== */
+function pgPerson(pid){
+  const p=P(pid); if(!p) return `<div class="empty">No person “${esc(pid)}”. <a href="#people">Back to Roles and people</a></div>`;
+  const o=ownedSteps(pid), gov=govFor(pid), c=capacityFor(pid), bk=backupOf(pid);
+  const reports=people().filter(q=>q.reportsTo===pid);
+  const byCad=k=>gov.filter(g=>cadence(g)===k);
+  const govList=k=>{ const L=byCad(k); return L.length?`<ul class="clean small">${L.map(g=>`<li>${wfTag(g.w)} ${esc(g.a)}${g.rep?` <span class="muted">· ${esc(g.rep)}</span>`:''}</li>`).join('')}</ul>`:'<div class="small muted">None in workbook</div>'; };
+  const stepsBlock=(wf,ids)=>ids.length?ids.map(id=>stepLink(wf,id)).join(''):'<span class="small muted">None</span>';
+  const dayTasks=c?c.items.filter(i=>i.unit==='day'||i.unit==='dayEach'):[];
+  const out=[];
+  out.push(`<div class="phead"><span class="bigav" style="width:58px;height:58px;font-size:20px;background:${p.vacant?'var(--p0)':p.color}">${initials(p.name)}</span><div><h1>${esc(p.name)}${p.full?` <span class="muted" style="font-size:18px;font-weight:700">(${esc(p.full)})</span>`:''}</h1><div class="row" style="margin-top:6px"><b>${esc(p.role)}</b> ${wfTag(p.wf)} ${srcTag(p)} ${!inScen(p)?'<span class="tagx t-grey">Not in current scenario</span>':''}</div></div><div class="row" style="margin-left:auto"><a class="pillbtn" href="#people">All people</a><a class="pillbtn primary" href="#home">Home</a></div></div>`);
+  out.push(`<div class="two"><div class="panel"><h3>1 · Role summary</h3><p>${esc(p.summary)}</p>${p.alias?`<p class="small muted">Also spelled “${esc(p.alias)}” in the workbook.</p>`:''}
+    <dl class="kv mt"><dt>2 · Reports to</dt><dd>${p.reportsTo?chip(p.reportsTo):'<span class="muted">Not in workbook</span>'}</dd>
+    <dt>Direct reports</dt><dd>${reports.length?reports.map(r=>chip(r.id)).join(' '):'<span class="muted">—</span>'}</dd>
+    <dt>Backup when off</dt><dd>${bk?(bk==='cc'?chip('cc'):chip(bk)):'<span class="muted">Not defined</span>'}${p.backupNote?`<div class="small muted">${esc(p.backupNote)}</div>`:''}</dd>
+    <dt>10 · Escalation</dt><dd class="small">${esc(p.esc)}</dd></dl></div>
+    <div class="panel"><h3>9 · SLA / KPI accountability</h3><ul class="clean small">${(p.kpis||[]).map(k=>`<li>${esc(k)}</li>`).join('')}</ul>
+    <div class="small muted mt">Accountability does not transfer to a backup: during cover, the backup is accountable for actions taken; the KPI remains with ${esc(p.name)}.</div></div></div>`);
+  out.push(`<div class="panel mt"><h3>3–5 · Responsibilities in the workflows</h3>
+    <div class="grid g2 mt"><div><h4>BD steps owned</h4><div class="mt">${stepsBlock('bd',o.bd)}</div>${o.bdSup.length?`<h4 class="mt">BD steps supported</h4><div class="mt">${stepsBlock('bd',o.bdSup)}</div>`:''}</div>
+    <div><h4>PM steps owned</h4><div class="mt">${stepsBlock('pm',o.pm)}</div>${o.pmSup.length?`<h4 class="mt">PM steps supported</h4><div class="mt">${stepsBlock('pm',o.pmSup)}</div>`:''}</div></div></div>`);
+  out.push(`<div class="grid g3 mt"><div class="panel"><h3>6 · Daily</h3>${govList('Daily')}${dayTasks.length?`<div class="tiny muted mt">Plus daily discipline: ${dayTasks.map(t=>esc(t.label)).join('; ')}</div>`:''}</div><div class="panel"><h3>7 · Weekly</h3>${govList('Weekly')}</div><div class="panel"><h3>8 · Monthly / ongoing</h3>${govList('Monthly')}${govList('Ongoing / as required')}</div></div>`);
+  if(c){ const [cl,lab]=ustat(c.util);
+    out.push(`<div class="panel mt"><div class="row"><h3>13 · Capacity vs assigned workload</h3><span class="tagx ${cl==='over'?'t-p0':cl==='near'?'t-p1':'t-ok'}">${lab} · ${Math.round(c.util*100)}%</span><span class="small muted">Placeholder volumes and minutes — calibrate from FSM. <a href="#live">Edit inputs</a></span></div>
+      <div class="grid g4 mt"><div class="stat"><div class="v num">${f1(c.avail)}</div><div class="l">Rostered h / week (${c.wd} days)</div></div><div class="stat"><div class="v num">−${f1(c.brk+c.meet)}</div><div class="l">Breaks + huddles / handovers</div></div><div class="stat"><div class="v num">−${f1(c.fixed)}</div><div class="l">Fixed management time${pid==='anil'?' (6 h/day)':' (with Service Head)'}</div></div><div class="stat ${cl==='over'?'bad':cl==='near'?'warn':'good'}"><div class="v num">${f1(c.assigned)} / ${f1(c.prod)}</div><div class="l">Assigned vs productive h</div></div></div>
+      <div class="tblwrap mt"><table class="tbl"><tr><th>Activity</th><th>Driver</th><th>Min / unit</th><th>Hours / week</th><th>Ref</th></tr>${c.items.map(i=>`<tr><td>${esc(i.label)}</td><td class="small">${esc(unitLabel(i.unit))}${i.share&&i.share<1?` × ${f1(i.share*100)}%`:''}</td><td class="num">${i.min==null?'—':i.min}</td><td class="num"><b>${f1(i.h)}</b></td><td class="small muted">${esc(i.ref)}</td></tr>`).join('')||'<tr><td colspan="5" class="muted">No workbook activities assigned — see open questions.</td></tr>'}</table></div></div>`); }
+  else if(p.id==='cc'){ out.push(`<div class="panel mt"><h3>13 · Capacity</h3><p class="small">CC headcount is not in the workbook. At current placeholder volumes the CC activities in the workflows need <b>${f1(ccHours())} h/week ≈ ${f1(ccFTE())} FTE</b>. For 7 × 12 coverage one seat needs at least 2 people (84 h ÷ 54 h).</p></div>`); }
+  else if(p.id==='tech_bd'||p.id==='tech_pm'){ const t=techCap(); const bd=p.id==='tech_bd'; const u=bd?t.bdD/t.bdC:t.pmD/t.pmC; out.push(`<div class="panel mt"><h3>13 · Team capacity</h3><div class="row">${ubar(u,240)} <b class="num">${Math.round(u*100)}%</b> <span class="small muted">${bd?`${S.vol.techBD} technicians`:`${S.vol.pmTeams} vendor teams (to confirm)`} × 6 days × ${9-S.vol.brk} h · demand ${f0(bd?t.bdD:t.pmD)} h/week at ${bd?S.vol.bdVisitMin:S.vol.pmVisitMin} min per visit incl. travel (placeholder)</span></div></div>`); }
+  out.push(liveForPerson(pid));
+  if(hasRoster(p)){
+    out.push(`<div class="sechead"><h2>12 · 7-day calendar</h2><span class="note">Proposed roster — scenario ${S.scen==='A'?'Workbook':'+ Org chart'}</span></div>
+    <div class="row noprint mb"><button class="pillbtn sm ${S.calView==='week'?'on':''}" onclick="S.calView='week';route()">Week</button><button class="pillbtn sm ${S.calView==='day'?'on':''}" onclick="S.calView='day';route()">Day</button>${S.calView==='day'?DAYS.map((d,i)=>`<button class="pillbtn sm ${S.calDay===i?'on':''}" onclick="S.calDay=${i};route()">${d}</button>`).join(''):''}
+    <select class="sel" onchange="go('person/'+this.value)" aria-label="Switch person">${people().filter(hasRoster).map(q=>`<option value="${q.id}" ${q.id===pid?'selected':''}>${esc(q.name)} — ${esc(q.role)}</option>`).join('')}</select></div>
+    ${calendarHTML(pid,S.calView,S.calDay)}${CAL_LEGEND}`);
+  } else out.push(`<div class="panel mt"><h3>12 · 7-day calendar</h3><div class="empty">${p.vacant?'Vacant or unnamed — no one to roster. See open questions.':p.team?'Team without named members or headcount in the workbook. Roster requirement is shown on the 7-Day Roster page.':'No roster.'}</div></div>`);
+  out.push(`<div class="row mt2"><a class="pillbtn" href="#roster">7-day roster</a><a class="pillbtn" href="#bd">BD workflow</a><a class="pillbtn" href="#pm">PM workflow</a><a class="pillbtn primary" href="#home">Home</a></div>`);
+  return out.join('');
+}
+function unitLabel(u){ return {bd:'per BD ticket',fu:'per BD follow-up',foc:'per FoC follow-up',bill:'per billable case',billok:'per accepted billable',esc:'per escalated case',pm:'per PM visit',pmfu:'per PM follow-up',fail:'per machine failure',day:'per working day',dayEach:'per coordinator per day',week:'per week',month:'per month',backup:'weekly-off cover'}[u]||u; }
+
+/* =========================== ROSTER =========================== */
+function pgRoster(){
+  const d=S.rDay; const ps=people().filter(hasRoster).filter(p=>S.rFilter==='all'||p.grp===S.rFilter);
+  const offs=people().filter(hasRoster).filter(p=>rosterCode(p,d)==='X');
+  const t=nowH(); const isToday=d===todayIdx();
+  const gh=`<div class="ghead"><div style="padding:6px 12px">Person</div><div class="gt">${Array.from({length:13},(_,i)=>`<span style="left:${i/12*100}%">${hm(WIN.s+i)}</span>`).join('')}</div></div>`;
+  const rows=ps.map(p=>{ const r=blocksFor(p.id,d); let bars='';
+    if(r.off) bars=`<div class="gbar" style="left:0;right:0;background:repeating-linear-gradient(45deg,#FAF6F8,#FAF6F8 8px,#fff 8px,#fff 16px);color:var(--muted);border:1px dashed #E3D7DE">Weekly off — backup ${backupOf(p.id)?(backupOf(p.id)==='cc'?'CC':esc(P(backupOf(p.id)).name)):'not defined'}</div>`;
+    else if(r.blocks) bars=r.blocks.map(b=>`<div class="gbar k-${b.kind}" style="left:${(b.s-WIN.s)/12*100}%;width:calc(${(b.e-b.s)/12*100}% - 2px)" title="${hm(b.s)}–${hm(b.e)} ${esc(b.label)}">${esc(b.label)}</div>`).join('');
+    return `<div class="grow"><div class="gn"><a href="#person/${p.id}">${esc(p.name)}</a> <span class="sc ${r.code||'X'}" style="min-width:24px;font-size:10.5px">${r.code==='X'?'off':r.code}</span></div><div class="gtrack">${Array.from({length:13},(_,i)=>`<div class="gl" style="left:${i/12*100}%"></div>`).join('')}${bars}${isToday&&t>=WIN.s&&t<WIN.e?`<div class="nowline" style="left:${(t-WIN.s)/12*100}%"></div>`:''}</div></div>`; }).join('');
+  const matrix=people().filter(hasRoster).map(p=>`<tr class="click" onclick="go('person/${p.id}')"><td>${chip(p.id)}</td><td class="small">${esc(p.role)}</td>${DAYS.map((x,i)=>{const c=rosterCode(p,i);return `<td class="cell"><span class="sc ${c}">${c==='X'?'off':c}</span></td>`}).join('')}<td class="num">${workdays(p)} × 9 h</td><td>${backupOf(p.id)?(backupOf(p.id)==='cc'?chip('cc'):chip(backupOf(p.id))):'<span class="tagx t-p0">None</span>'}</td></tr>`).join('');
+  const G=covGroups();
+  const covRows=G.map(g=>{ const s=covStats(g.ids); const n=g.ids.length; return `<tr><td><b>${esc(g.n)}</b><div class="tiny muted">${esc(g.why)}</div></td><td>${chips(g.ids)}</td><td class="num">${n} × 54 = ${n*54} h</td><td class="num">84 h</td><td class="num">${Math.ceil(84/54)}</td><td class="num"><b>${Math.round(s.pct*100)}%</b></td><td class="num">${f1(s.gapH)} h</td><td class="num">${f1(s.brkH)} h</td></tr>`; }).join('');
+  const acct=ACCT().map(a=>`<tr><td><b>${esc(a[0])}</b> ${wfTag(a[1])}</td><td>${chips(a[2])}</td><td>${chips(a[3])}</td><td>${chip(a[4])}</td><td class="small">${esc(a[5])}</td></tr>`).join('');
+  return `<div class="phead"><div><h1>7-day operating roster</h1><p class="sub">Coverage 7 days × 12 hours (08:00–20:00, assumed) with each person on 6 days × ~9 hours and one weekly off. Staggered Shift A (08:00–17:00) and Shift B (11:00–20:00) overlap for 6 hours; handovers at 11:00 and 16:30–17:00; staggered breaks keep someone on duty.</p></div></div>
+  <div class="banner draft mb">Proposed roster, not yet valid: depends on P0-1 (hours), P0-3 (SC headcount), P0-5 (CC), P0-6 (coordinators) and P0-7 (technician shifts). Switch the headcount scenario in the sidebar to compare.</div>
+  <div class="sechead"><h2>Weekly roster matrix</h2></div>
+  <div class="tblwrap"><table class="tbl matrix"><tr><th>Person</th><th>Role</th>${DAYS.map(x=>`<th style="text-align:center">${x}</th>`).join('')}<th>Load</th><th>Backup</th></tr>${matrix}</table></div>
+  <div class="panel mt"><h3>Roster requirements for teams without named people</h3><ul class="clean small">
+   <li>${chip('cc')} At least one CC seat in Shift A and one in Shift B every day → minimum 2 people for a single seat (84 ÷ 54 h), 3–4 for two seats with weekly offs. Current workload model needs ≈ <b>${f1(ccFTE())} FTE</b>.</li>
+   <li>${chip('tech_bd')} 26 technicians, 6-day week → ≈ ${f1(26*6/7)} available per day. Weekly offs should be spread ≈ 3–4 per day and split across Rakesh’s 16 and Shakeel’s 6+4 teams. Shift split (A / B) depends on P0-7.</li>
+   <li>${chip('tech_pm')} Vendor team offs agreed with each vendor; coordinators track availability daily (PM admin 1).</li></ul></div>
+  <div class="sechead"><h2>Day view</h2><div class="row noprint">${DAYS.map((x,i)=>`<button class="pillbtn sm ${d===i?'on':''}" onclick="S.rDay=${i};route()">${x}${i===todayIdx()?' · today':''}</button>`).join('')}</div>
+   <select class="sel noprint" onchange="S.rFilter=this.value;route()">${['all','Management','Coordination','Intake','Support'].map(g=>`<option value="${g}" ${S.rFilter===g?'selected':''}>${g==='all'?'All roles':g}</option>`).join('')}</select></div>
+  <div class="small mb"><b>Off on ${DAYSL[d]}:</b> ${offs.map(p=>chip(p.id)).join(' ')||'—'}</div>
+  <div class="gantt"><div class="gin">${gh}${rows}</div></div>${CAL_LEGEND}
+  <div class="sechead"><h2>Coverage heatmaps</h2><span class="note">Number on duty per half hour · <b>×</b> nobody rostered · <b>b</b> rostered but all on break</span></div>
+  <div class="grid g2">${G.map(g=>`<div class="panel"><div class="row"><h3>${esc(g.n)}</h3><span class="tagx ${covStats(g.ids).pct>=.999?'t-ok':'t-p0'}">${Math.round(covStats(g.ids).pct*100)}% covered</span></div><div class="mt">${heatmap(g.ids)}</div></div>`).join('')}</div>
+  <div class="sechead"><h2>Coverage arithmetic</h2><span class="note">One seat for 84 h/week needs at least two people at 54 h each</span></div>
+  <div class="tblwrap"><table class="tbl"><tr><th>Coverage group</th><th>People</th><th>Rostered hours</th><th>Seat need</th><th>Min people / seat</th><th>Covered</th><th>No one rostered</th><th>All on break</th></tr>${covRows}</table></div>
+  <div class="sechead"><h2>Accountability and backup</h2><span class="note">Primary keeps the KPI; the backup is accountable only for actions during cover</span></div>
+  <div class="tblwrap"><table class="tbl"><tr><th>Process area</th><th>Primary owner</th><th>Backup</th><th>Escalation owner</th><th>Handover rule</th></tr>${acct}</table></div>
+  <div class="panel mt"><h3>Handover protocol (proposed)</h3><div class="grid g3 mt small">
+   <div><h4>11:00 — Shift B joins</h4><p>Five-minute huddle per team: open appointments, customer callbacks, spare status, escalations. Shift A owner remains owner of items already in progress.</p></div>
+   <div><h4>16:30–17:00 — Shift A hands over</h4><p>Handover note per queue (FSM W/O note or Cliq channel — to confirm): what is open, who is waiting, what is due before 20:00. Receiving person acknowledges.</p></div>
+   <div><h4>Before a weekly off</h4><p>Owner tags the backup on every item due the next day. On return, the owner reviews what the backup did. KPIs are reported under the primary owner.</p></div></div></div>`;
+}
+</script>
+<script>
+/* =========================== SERVICE HEAD =========================== */
+const SH_NEED={bd:2.5,pm:1.5,esc:2};
+function shAlloc(d){ const r={bd:0,pm:0,esc:0,break:0,flex:0}; if(rosterCode(P('anil'),d)==='X') return null; anilPlan(d).forEach(b=>{ r[b[3]]=(r[b[3]]||0)+(b[1]-b[0]); }); return r; }
+function shEscOwner(d){ const on=['jp','pradeep'].filter(x=>rosterCode(P(x),d)&&rosterCode(P(x),d)!=='X'); return on; }
+function pgSH(){
+  const d=S.shDay, anil=P('anil'), code=rosterCode(anil,d), t=nowH(), isToday=d===todayIdx();
+  const plan=code==='X'?[]:anilPlan(d);
+  const gh=`<div class="ghead"><div style="padding:6px 12px">Service Head</div><div class="gt">${Array.from({length:13},(_,i)=>`<span style="left:${i/12*100}%">${hm(WIN.s+i)}</span>`).join('')}</div></div>`;
+  const bars=code==='X'?`<div class="gbar" style="left:0;right:0;background:repeating-linear-gradient(45deg,#FAF6F8,#FAF6F8 8px,#fff 8px,#fff 16px);color:var(--muted);border:1px dashed #E3D7DE">Weekly off — escalation owner: ${shEscOwner(d).map(x=>esc(P(x).name)).join(' (BD) / ')||'not defined'}</div>`
+    : plan.map(b=>`<div class="gbar k-${b[3]}" style="left:${(b[0]-WIN.s)/12*100}%;width:calc(${(b[1]-b[0])/12*100}% - 2px)" title="${hm(b[0])}–${hm(b[1])} ${esc(b[2])}">${esc(b[2])}</div>`).join('');
+  const withRows=code==='X'?'':plan.map(b=>`<tr><td class="num">${hm(b[0])}–${hm(b[1])}</td><td><span class="tagx ${b[3]==='esc'?'t-p0':b[3]==='bd'?'t-bd':b[3]==='pm'?'t-pm':b[3]==='break'?'t-grey':'t-p1'}">${{esc:'Escalations',bd:'BD ASM',pm:'PM ASM',break:'Break',flex:'Analysis / admin'}[b[3]]}</span></td><td>${esc(b[2])||'<span class="muted">Buffer</span>'}</td><td>${chips(b[4]||[])}${(b[5]||[]).map(j=>` <span class="tiny muted">${hm(j[0])}–${hm(j[1])}:</span> ${chips(j[2])}`).join('')}</td></tr>`).join('');
+  const A=shAlloc(d);
+  const seg=(k,lab,bg,fg)=>A&&A[k]>0?`<div style="flex:${A[k]};background:${bg};color:${fg||'#fff'}" title="${lab} ${f1(A[k])} h">${lab} ${f1(A[k])} h</div>`:'';
+  const hb=A?`<div class="hbar">${seg('bd','BD ASM','var(--purple)')}${seg('pm','PM ASM','var(--blue-d)')}${seg('esc','Escalations','var(--p0)')}${seg('break','Break','#CFC4CC','var(--ink2)')}${seg('flex','Everything else','#B8AE55')}</div>`:'<div class="empty">Weekly off</div>';
+  const week=DAYS.map((x,i)=>{ const a=shAlloc(i); const c=rosterCode(anil,i);
+    if(!a) return `<tr class="click" onclick="S.shDay=${i};route()"><td><b>${x}</b></td><td><span class="sc X">off</span></td><td colspan="4" class="small">Escalation owner: ${shEscOwner(i).map(chip).join(' ')} (on-duty ASMs — P0-2)</td><td><span class="tagx t-p1">Cover</span></td></tr>`;
+    const ok=['bd','pm','esc'].every(k=>a[k]>=SH_NEED[k]-.01);
+    return `<tr class="click" onclick="S.shDay=${i};route()"><td><b>${x}</b></td><td><span class="sc ${c}">${c}</span></td>${['bd','pm','esc'].map(k=>`<td class="num ${a[k]<SH_NEED[k]-.01?'':''}">${f1(a[k])} / ${f1(SH_NEED[k])}</td>`).join('')}<td class="num">${f1(a.flex)} h</td><td>${ok?'<span class="tagx t-ok">Mandatory met</span>':'<span class="tagx t-p0">Short</span>'}</td></tr>`; }).join('');
+  const c=capacityFor('anil'); const [cl,lab]=c?ustat(c.util):['none','—'];
+  const weekFlex=DAYS.reduce((s,x,i)=>{const a=shAlloc(i);return s+(a?a.flex:0)},0);
+  const nowB=isToday&&code!=='X'?plan.find(b=>t>=b[0]&&t<b[1]):null;
+  return `<div class="phead"><div><h1>Service Head schedule — ${esc(anil.name)}</h1><p class="sub">Mandatory daily blocks: <b>2.5 h BD ASM</b> (JP), <b>1.5 h PM ASM</b> (Pradeep) and <b>2 h escalated / delayed cases</b>. The remaining time must carry every weekly and monthly duty the workbook assigns to the Service Head.</p></div><div class="row" style="margin-left:auto"><a class="pillbtn" href="#person/anil">Person page</a></div></div>
+  <div class="banner draft mb">Shift times, block times and task durations are assumptions (P0-1, P0-2). The BD and PM daily reviews (Reports 1–3) are drafted <i>inside</i> the ASM sessions; if they are extra, the Service Head is further over capacity.</div>
+  ${isToday?`<div class="banner info mb"><b>Now ${hm(t)}:</b> ${code==='X'?'Service Head on weekly off — route escalations to '+shEscOwner(d).map(x=>esc(P(x).name)).join(' / '):nowB?esc(nowB[2]||'Buffer')+' ('+hm(nowB[0])+'–'+hm(nowB[1])+')':'Outside Service Head shift ('+esc(SHIFTS[code].time)+')'}</div>`:''}
+  <div class="row noprint mb">${DAYS.map((x,i)=>`<button class="pillbtn sm ${d===i?'on':''}" onclick="S.shDay=${i};route()">${x}${i===todayIdx()?' · today':''}</button>`).join('')}</div>
+  <div class="sechead"><h2>${DAYSL[d]} — ${code==='X'?'weekly off':SHIFTS[code].name+' · '+SHIFTS[code].time}</h2></div>
+  <div class="gantt"><div class="gin">${gh}<div class="grow"><div class="gn"><a href="#person/anil">${esc(anil.name)}</a> <span class="sc ${code}" style="min-width:24px;font-size:10.5px">${code==='X'?'off':code}</span></div><div class="gtrack">${Array.from({length:13},(_,i)=>`<div class="gl" style="left:${i/12*100}%"></div>`).join('')}${bars}${isToday&&t>=WIN.s&&t<WIN.e?`<div class="nowline" style="left:${(t-WIN.s)/12*100}%"></div>`:''}</div></div></div></div>
+  <div class="panel mt"><h3>Time allocation — ${DAYSL[d]} (9-hour shift)</h3><div class="mt">${hb}</div>
+   ${withRows?`<div class="tblwrap mt"><table class="tbl"><tr><th>Time</th><th>Type</th><th>Activity</th><th>With</th></tr>${withRows}</table></div>`:''}</div>
+  <div class="two mt">
+   <div class="panel"><h3>Mandatory blocks by day</h3><div class="tblwrap mt"><table class="tbl"><tr><th>Day</th><th>Shift</th><th>BD ASM h</th><th>PM ASM h</th><th>Escalation h</th><th>Left for rest</th><th>Check</th></tr>${week}</table></div>
+    <p class="small muted mt">Tuesday (JP off): the BD block is held with Rakesh. Thursday (Pradeep off): the PM block is held with the Technician Coordinators. Sunday: no Service Head on duty — the on-duty ASMs own escalations.</p></div>
+   <div class="panel"><h3>Analysis theme for the flexible block</h3><div class="tblwrap mt"><table class="tbl"><tr><th>Day</th><th>Theme</th></tr>${DAYS.map((x,i)=>`<tr><td><b>${x}</b></td><td class="small">${rosterCode(anil,i)==='X'?'<span class="muted">Weekly off</span>':esc(FLEX[i]||'Buffer')}</td></tr>`).join('')}</table></div></div>
+  </div>
+  ${c?`<div class="sechead"><h2>Is the time enough?</h2><span class="tagx ${cl==='over'?'t-p0':cl==='near'?'t-p1':'t-ok'}">${lab} · ${Math.round(c.util*100)}%</span></div>
+  <div class="grid g4"><div class="stat"><div class="v num">${f1(c.avail)}</div><div class="l">Rostered h / week (${c.wd} days × 9)</div></div><div class="stat"><div class="v num">−${f1(c.brk)}</div><div class="l">Breaks</div></div><div class="stat"><div class="v num">−${f1(c.fixed)}</div><div class="l">Mandatory ASM + escalation blocks</div></div><div class="stat ${cl==='over'?'bad':cl==='near'?'warn':'good'}"><div class="v num">${f1(c.prod)} vs ${f1(c.assigned)}</div><div class="l">Free hours vs weekly / monthly duties</div></div></div>
+  <div class="two mt"><div class="panel"><h3>Duties that must fit in ≈ ${f1(weekFlex)} h / week</h3><div class="tblwrap mt"><table class="tbl"><tr><th>Duty</th><th>Driver</th><th>h / week</th></tr>${c.items.map(i=>`<tr><td class="small">${esc(i.label)}</td><td class="small muted">${esc(unitLabel(i.unit))} · ${i.min} min</td><td class="num"><b>${f1(i.h)}</b></td></tr>`).join('')}<tr><td><b>Total</b></td><td></td><td class="num"><b>${f1(c.assigned)}</b></td></tr></table></div><p class="tiny muted">Minutes are placeholders. Edit them on <a href="#live">Live Workload</a>.</p></div>
+   <div class="panel"><h3>Finding and options</h3><p class="small">${c.util>1?`<b>Not sufficient.</b> The 6 mandatory hours leave ${f1(c.prod)} h/week, below the ${f1(c.assigned)} h/week of weekly and monthly duties. There is no buffer for unplanned escalations, customer visits or leadership meetings.`:`Sufficient at current placeholder values, with ${f1(c.prod-c.assigned)} h/week of buffer.`}</p>
+    <ul class="clean small"><li><b>Automate reports.</b> Build Reports 4–6 as Zoho Analytics dashboards over FSM + Desk + Books so the Service Head reviews, not prepares (saves ≈ 2–3 h/week).</li>
+    <li><b>Merge quality reviews.</b> One weekly BD + PM quality review with both ASMs instead of two.</li>
+    <li><b>Delegate transactional work.</b> Vendor payout to Finance / Books; technician recruitment sourcing to HR, with the Service Head doing final interviews only.</li>
+    <li><b>Shorten fixed blocks when volume is low.</b> Make the 2 h escalation block “up to 2 h”, releasing time when the Report 3 queue is empty.</li>
+    <li><b>Formalise escalation cover.</b> On the weekly off and outside the Service Head shift, the on-duty ASM is the escalation owner (P0-2).</li></ul></div></div>`:''}`;
+}
+
+/* =========================== LIVE WORKLOAD =========================== */
+const VOL_LABELS=[['bd','BD tickets / day'],['fuPct','BD needing follow-up %'],['billPct','Follow-ups billable %'],['agreePct','Billable accepted %'],['pm','PM visits / day'],['pmFuPct','PM follow-up %'],['failPct','PM machine failure %'],['techBD','BD technicians'],['bdVisitMin','BD visit minutes'],['pmTeams','PM vendor teams'],['pmVisitMin','PM visit minutes'],['brk','Break h / day'],['meet','Huddle / handover h / day']];
+const CSV_COLS=['ticket_id','workflow','created','status','stage','owner','pending_reason','escalated','closed','mac_id'];
+const LIVE_STAGES=['Intake','Scheduled','Dispatched','In progress','Follow-up','Awaiting spare','Awaiting customer','Quotation / payment','Escalated','Closure pending','Closed'];
+function setVol(k,v){ S.vol[k]=+v; save(); route(); }
+function setMin(k,v){ if(v===''||isNaN(+v)) delete S.min[k]; else S.min[k]=+v; save(); route(); }
+function resetInputs(){ S.vol={...VOL_DEFAULT}; S.min={}; save(); route(); }
+function pgLive(){
+  const inp=VOL_LABELS.map(([k,l])=>`<label>${l}<input type="number" min="0" step="any" value="${S.vol[k]}" onchange="setVol('${k}',this.value)"></label>`).join('');
+  const ps=people().filter(hasRoster);
+  const rows=ps.map(p=>{ const c=capacityFor(p.id); if(!c) return ''; const [cl,lab]=ustat(c.util);
+    return `<tr class="click" onclick="go('person/${p.id}')"><td>${chip(p.id)}</td><td class="small">${esc(p.role)}</td><td class="num">${c.wd}</td><td class="num">${f1(c.avail)}</td><td class="num">${f1(c.brk+c.meet)}</td><td class="num">${f1(c.fixed)}</td><td class="num"><b>${f1(c.prod)}</b></td><td class="num"><b>${f1(c.assigned)}</b></td><td>${ubar(c.util,120)}</td><td><span class="tagx ${cl==='over'?'t-p0':cl==='near'?'t-p1':'t-ok'}">${Math.round(c.util*100)}% · ${lab}</span></td></tr>`; }).join('');
+  const t=techCap(); const tr=(n,d,cp,note)=>{ const u=d/cp; const [cl,lab]=ustat(u); return `<tr><td><b>${n}</b></td><td class="small">${note}</td><td class="num">${f1(d)}</td><td class="num">${f1(cp)}</td><td>${ubar(u,120)}</td><td><span class="tagx ${cl==='over'?'t-p0':cl==='near'?'t-p1':'t-ok'}">${Math.round(u*100)}% · ${lab}</span></td></tr>`; };
+  const keys=[...new Set(ps.map(p=>taskKey(p.id)).concat(['cc']))].filter(k=>TASKS[k]);
+  const minEd=keys.map(k=>{ const nm=k==='tcs'?'Technician Coordinators (shared)':k==='siddeshB'?'Siddesh (PM DEO)':k==='cc'?'Contact Centre':(P(k)?P(k).name:k);
+    return `<details class="panel mt"><summary><b>${esc(nm)}</b> <span class="small muted">· ${TASKS[k].length} activities</span></summary><div class="tblwrap mt"><table class="tbl"><tr><th>Activity</th><th>Driver</th><th>Minutes / unit</th><th>Ref</th></tr>${TASKS[k].map((x,i)=>`<tr><td class="small">${esc(x[0])}</td><td class="small muted">${esc(unitLabel(x[1]))}</td><td><input class="minin" type="number" min="0" step="any" value="${tmin(k,i)}" onchange="setMin('${k}|${i}',this.value)">${S.min[k+'|'+i]!=null?' <span class="tagx t-p1">edited</span>':''}</td><td class="tiny muted">${esc(x[3])}</td></tr>`).join('')}</table></div></details>`; }).join('');
+  return `<div class="phead"><div><h1>Live workload</h1><p class="sub">Two layers. <b>Model</b>: expected weekly load per person from volumes × minutes per activity, against productive hours. <b>Board</b>: actual open work from a Zoho FSM / Desk export (CSV), with ageing against T+1 / T+2 / T+4.</p></div></div>
+  <div class="banner draft mb">All volumes and minutes below are <b>placeholders</b> — the workbook has none. Replace with 4–8 weeks of FSM history (P0-4). Thresholds: under &lt; 85%, near 85–100%, over &gt; 100% of productive hours (assumption P2-2).</div>
+  <div class="panel"><div class="row"><h3>Volume and productivity inputs</h3><button class="pillbtn sm" style="margin-left:auto" onclick="resetInputs()">Reset to defaults</button></div><div class="inputs mt">${inp}</div>
+   <p class="tiny muted mt">Derived per week: ${f0(vol().bd)} BD tickets · ${f0(vol().fu)} follow-ups · ${f0(vol().bill)} billable · ${f0(vol().esc)} escalated · ${f0(vol().pm)} PM visits · ${f0(vol().fail)} machine failures. Saved in this browser only.</p></div>
+  <div class="sechead"><h2>Capacity per person (weekly)</h2><span class="note">Productive = rostered − breaks − huddles − fixed time with the Service Head</span></div>
+  <div class="tblwrap"><table class="tbl"><tr><th>Person</th><th>Role</th><th>Days</th><th>Rostered h</th><th>Breaks + huddles</th><th>Fixed mgmt</th><th>Productive</th><th>Assigned</th><th>Load</th><th>Status</th></tr>${rows}</table></div>
+  <div class="sechead"><h2>Teams</h2></div>
+  <div class="tblwrap"><table class="tbl"><tr><th>Team</th><th>Basis</th><th>Demand h / wk</th><th>Capacity h / wk</th><th>Load</th><th>Status</th></tr>
+   ${tr('BD technicians',t.bdD,t.bdC,`${S.vol.techBD} techs × 6 days × ${9-S.vol.brk} h · first visits + follow-ups × ${S.vol.bdVisitMin} min (travel inside)`)}
+   ${tr('PM vendor teams',t.pmD,t.pmC,`${S.vol.pmTeams} teams × 6 days × ${9-S.vol.brk} h · visits + follow-ups × ${S.vol.pmVisitMin} min`)}
+   <tr><td><b>Contact Centre</b></td><td class="small">Headcount unknown (P0-5) — model gives required FTE</td><td class="num">${f1(ccHours())}</td><td class="num">—</td><td colspan="2"><b>${f1(ccFTE())} FTE needed</b> <span class="small muted">· minimum 2 for one 7 × 12 seat</span></td></tr></table></div>
+  <div class="sechead"><h2>Minutes per activity</h2><span class="note">Edit to calibrate; every capacity figure in the file updates</span></div>${minEd}
+  <div class="sechead"><h2>Live board</h2><span class="note">Load a Zoho FSM / Desk export — processed only in this browser</span></div>
+  <div class="panel noprint"><div class="row"><label class="pillbtn primary" style="cursor:pointer">Import CSV<input type="file" accept=".csv,text/csv" style="display:none" onchange="importCSV(this)"></label>
+   <button class="pillbtn" onclick="downloadTemplate()">Download CSV template</button>
+   <button class="pillbtn" onclick="genSynthetic()">Load synthetic sample</button>
+   ${S.data?`<button class="pillbtn" onclick="S.data=null;S.dataSynthetic=false;route()">Clear data</button>`:''}</div>
+   <p class="tiny muted mt">Columns: <code>${CSV_COLS.join(', ')}</code>. <code>workflow</code> = BD / PM; <code>owner</code> = person name or id (e.g. Rakesh, shakeel); <code>created</code>/<code>closed</code> = YYYY-MM-DD HH:MM; <code>escalated</code> = Y / N. Build the export in Zoho Analytics over the FSM Work Order + Desk Tickets views.</p></div>
+  <div id="liveboard" class="mt"></div>`;
+}
+function resolveOwner(s){ s=String(s||'').trim().toLowerCase(); if(!s) return null; const p=PEOPLE.find(p=>p.id===s||p.name.toLowerCase()===s||(p.full&&p.full.toLowerCase()===s)||(p.alias&&p.alias.toLowerCase()===s)); return p?p.id:null; }
+function parseCSV(txt){ const rows=[]; let row=[],cur='',q=false; for(let i=0;i<txt.length;i++){ const ch=txt[i];
+  if(q){ if(ch==='"'){ if(txt[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=ch; }
+  else if(ch==='"') q=true; else if(ch===','){ row.push(cur); cur=''; } else if(ch==='\n'||ch==='\r'){ if(ch==='\r'&&txt[i+1]==='\n') i++; row.push(cur); cur=''; if(row.some(x=>x!=='')) rows.push(row); row=[]; } else cur+=ch; }
+  row.push(cur); if(row.some(x=>x!=='')) rows.push(row); return rows; }
+function normRows(arr){ const h=arr[0].map(x=>x.trim().toLowerCase().replace(/\s+/g,'_')); return arr.slice(1).map(r=>{ const o={}; h.forEach((k,i)=>o[k]=(r[i]||'').trim()); o.workflow=(o.workflow||'BD').toUpperCase().startsWith('P')?'PM':'BD'; o.owner_id=resolveOwner(o.owner); o._c=o.created?new Date(o.created.replace(' ','T')):null; o._x=o.closed?new Date(o.closed.replace(' ','T')):null; o.esc=/^(y|yes|true|1)$/i.test(o.escalated||''); o.isClosed=!!o._x||/closed|completed/i.test(o.status||''); return o; }); }
+function importCSV(inp){ const f=inp.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const a=parseCSV(String(r.result)); if(a.length<2) throw new Error('No rows'); S.data=normRows(a); S.dataSynthetic=false; route(); }catch(e){ alert('Could not read CSV: '+e.message); } }; r.readAsText(f); }
+function downloadTemplate(){ const ex=['BD-100231','BD','2026-09-22 10:15','Open','Follow-up','Shakeel','Awaiting spare','N','','AA:BB:CC:DD:EE:01']; const csv=CSV_COLS.join(',')+'\n'+ex.join(',')+'\n'; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='circolife_live_workload_template.csv'; document.body.appendChild(a); a.click(); a.remove(); }
+function genSynthetic(){ let seed=7; const rnd=()=>{ seed=(seed*16807)%2147483647; return (seed-1)/2147483646; }; const pick=a=>a[Math.floor(rnd()*a.length)];
+  const now=new Date(); const out=[['ticket_id','workflow','created','status','stage','owner','pending_reason','escalated','closed','mac_id']];
+  const bdOwn={'Intake':['Karan'],'Scheduled':['Rakesh'],'Dispatched':['Rakesh'],'In progress':['Rakesh'],'Follow-up':['Shakeel'],'Awaiting spare':['Shakeel'],'Awaiting customer':['Shakeel'],'Quotation / payment':['JP'],'Escalated':['JP'],'Closure pending':['Rakesh'],'Closed':['Rakesh','Shakeel']};
+  const pmOwn=['Mrunal','Rakhi',S.scen==='A'?'Vivek':'Rahul']; const hrs=h=>{ const d=new Date(now-h*3600e3); return d.toISOString().slice(0,16).replace('T',' '); };
+  for(let i=0;i<260;i++){ const pm=rnd()<.45; const st=pm?pick(['Scheduled','Scheduled','Dispatched','In progress','Awaiting customer','Follow-up','Closure pending','Closed','Closed','Closed']):pick(['Intake','Scheduled','Scheduled','Dispatched','In progress','Follow-up','Follow-up','Awaiting spare','Awaiting customer','Quotation / payment','Escalated','Closure pending','Closed','Closed','Closed','Closed']);
+    const age=Math.floor(rnd()*rnd()*140); const own=pm?(st==='Closure pending'||st==='Closed'?'Pradeep':st==='Follow-up'&&rnd()<.4?'Shakeel':pick(pmOwn)):pick(bdOwn[st]);
+    const pr={'Awaiting spare':'Spare','Awaiting customer':'Customer','Quotation / payment':pick(['Quotation','Payment'])}[st]||'';
+    out.push([(pm?'PM-':'BD-')+(200000+i),pm?'PM':'BD',hrs(age),st==='Closed'?'Closed':'Open',st,own,pr,st==='Escalated'||(age>72&&rnd()<.3)?'Y':'N',st==='Closed'?hrs(Math.max(0,age-Math.floor(rnd()*30))):'','SYN:'+i.toString(16).padStart(4,'0')]); }
+  S.data=normRows(out); S.dataSynthetic=true; route(); }
+function ageBucket(o){ const h=((o._x&&o.isClosed?o._x:new Date())-o._c)/3600e3; const d=Math.floor(h/24); return isNaN(d)?null:Math.min(Math.max(d,0),4); }
+function ageStyle(b,n){ if(!n) return 'background:#FAF6F8;color:#C9B6C4'; const a=Math.min(.25+n/25,1); const col=b<=1?'47,107,46':b===2?'154,91,0':'180,35,24'; return `background:rgba(${col},${a*.35});color:rgb(${col})`; }
+function renderLiveBoard(){ const el=$('#liveboard'); if(!el) return;
+  if(!S.data){ el.innerHTML='<div class="empty">No export loaded. Import a CSV, or load the synthetic sample to see how the board works.</div>'; return; }
+  const D=S.data, open=D.filter(o=>!o.isClosed), today=new Date().toDateString();
+  const closedToday=D.filter(o=>o.isClosed&&o._x&&o._x.toDateString()===today).length, newToday=D.filter(o=>o._c&&o._c.toDateString()===today).length;
+  const bd=D.filter(o=>o.workflow==='BD'), bdClosed=bd.filter(o=>o.isClosed&&o._x&&o._c), t1=bdClosed.filter(o=>(o._x-o._c)/3600e3<=24).length;
+  const stages=[...new Set(LIVE_STAGES.concat(D.map(o=>o.stage).filter(Boolean)))];
+  const heat=['BD','PM'].map(w=>{ const W=open.filter(o=>o.workflow===w); return stages.filter(s=>s!=='Closed').map(s=>{ const R=W.filter(o=>(o.stage||'—')===s); if(!R.length) return ''; const cnt=[0,1,2,3,4].map(b=>R.filter(o=>ageBucket(o)===b).length);
+    return `<tr><td>${wfTag(w)} ${esc(s)}</td>${cnt.map((n,b)=>`<td class="num" style="text-align:center;font-weight:900;${ageStyle(b,n)}">${n||'·'}</td>`).join('')}<td class="num"><b>${R.length}</b></td></tr>`; }).join(''); }).join('');
+  const owners=[...new Set(open.map(o=>o.owner_id||('?'+o.owner)))];
+  const own=owners.map(id=>{ const R=open.filter(o=>(o.owner_id||('?'+o.owner))===id); const late=R.filter(o=>ageBucket(o)>=2).length, e=R.filter(o=>o.esc).length; const known=id[0]!=='?'; const c=known?capacityFor(id):null; const [cl]=c?ustat(c.util):['none'];
+    const onNow=known&&P(id)&&hasRoster(P(id))?onDuty(id,todayIdx(),nowH()):null;
+    return {id,known,n:R.length,late,e,c,cl,onNow}; }).sort((a,b)=>b.n-a.n);
+  const ownRows=own.map(o=>`<tr ${o.known?`class="click" onclick="go('person/${o.id}')"`:''}><td>${o.known?chip(o.id):`<span class="tagx t-p1">Unmapped: ${esc(o.id.slice(1)||'blank')}</span>`}</td><td class="num"><b>${o.n}</b></td><td class="num">${o.late?`<b style="color:var(--p0)">${o.late}</b>`:0}</td><td class="num">${o.e}</td><td>${o.onNow==null?'<span class="muted">—</span>':o.onNow?'<span class="tagx t-ok">On duty</span>':'<span class="tagx t-grey">Off / break</span>'}</td><td>${o.c?`${ubar(o.c.util,100)} <span class="tiny muted">${Math.round(o.c.util*100)}% model</span>`:'—'}</td></tr>`).join('');
+  const escs=open.filter(o=>o.esc||ageBucket(o)>=4).sort((a,b)=>a._c-b._c).slice(0,12);
+  el.innerHTML=`${S.dataSynthetic?'<div class="banner synth mb"><b>SYNTHETIC SAMPLE — not CircoLife data.</b> Randomly generated tickets to demonstrate the board. Do not use for decisions.</div>':`<div class="banner info mb">${D.length.toLocaleString('en-IN')} rows loaded from CSV.</div>`}
+   <div class="grid g4"><div class="stat"><div class="v num">${open.length.toLocaleString('en-IN')}</div><div class="l">Open (BD ${open.filter(o=>o.workflow==='BD').length} · PM ${open.filter(o=>o.workflow==='PM').length})</div></div>
+   <div class="stat"><div class="v num">${newToday} / ${closedToday}</div><div class="l">New today / closed today</div></div>
+   <div class="stat ${open.filter(o=>ageBucket(o)>=2).length?'warn':'good'}"><div class="v num">${open.filter(o=>ageBucket(o)>=2).length}</div><div class="l">Open at T+2 or older</div></div>
+   <div class="stat ${bdClosed.length&&t1/bdClosed.length<.9?'bad':'good'}"><div class="v num">${bdClosed.length?Math.round(t1/bdClosed.length*100)+'%':'—'}</div><div class="l">BD closed within T+1 (target 90%, 24 h proxy)</div></div></div>
+   <div class="two mt"><div class="panel"><h3>Ageing heatmap — open work by stage</h3><div class="tblwrap mt"><table class="tbl"><tr><th>Stage</th><th>T+0</th><th>T+1</th><th>T+2</th><th>T+3</th><th>T+4+</th><th>Total</th></tr>${heat}</table></div><p class="tiny muted">Age in whole days from ticket creation (calendar days; P1-1 asks whether T+n is working days).</p></div>
+   <div class="panel"><h3>Open work per owner</h3><div class="tblwrap mt"><table class="tbl"><tr><th>Owner</th><th>Open</th><th>≥ T+2</th><th>Escalated</th><th>Now</th><th>Model load</th></tr>${ownRows}</table></div></div></div>
+   <div class="panel mt"><h3>Escalated or T+4+ — Report 3 queue</h3>${escs.length?`<div class="tblwrap mt"><table class="tbl"><tr><th>Ticket</th><th>Workflow</th><th>Stage</th><th>Owner</th><th>Age</th><th>Pending reason</th></tr>${escs.map(o=>`<tr><td class="num"><b>${esc(o.ticket_id)}</b></td><td>${wfTag(o.workflow)}</td><td>${esc(o.stage)}</td><td>${o.owner_id?chip(o.owner_id):esc(o.owner)}</td><td class="num">T+${ageBucket(o)}${ageBucket(o)===4?'+':''}</td><td class="small">${esc(o.pending_reason)||'—'}</td></tr>`).join('')}</table></div>`:'<div class="empty">None</div>'}</div>`;
+}
+function liveForPerson(pid){
+  const dash=DASH.filter(x=>x.o.includes(pid)||(x.o.includes('tcs')&&tcIds().includes(pid)));
+  let live='';
+  if(S.data){ const R=S.data.filter(o=>!o.isClosed&&o.owner_id===pid); const late=R.filter(o=>ageBucket(o)>=2).length;
+    live=`${S.dataSynthetic?'<div class="banner synth mb tiny">Synthetic sample data</div>':''}<div class="grid g3"><div class="stat"><div class="v num">${R.length}</div><div class="l">Open items owned</div></div><div class="stat ${late?'warn':'good'}"><div class="v num">${late}</div><div class="l">At T+2 or older</div></div><div class="stat"><div class="v num">${R.filter(o=>o.esc).length}</div><div class="l">Escalated</div></div></div>`; }
+  else live=`<div class="small muted">No FSM export loaded. <a href="#live">Load one on Live Workload</a> to see this person’s open items and ageing.</div>`;
+  const p=P(pid); const on=p&&hasRoster(p)?onDuty(pid,todayIdx(),nowH()):null;
+  return `<div class="two mt"><div class="panel"><h3>11 · Zoho FSM dashboards used</h3>${dash.length?`<ul class="clean small">${dash.map(x=>`<li><a href="#kpi">${esc(x.n)}</a> <span class="muted">· ${esc(x.r)}</span></li>`).join('')}</ul>`:'<div class="small muted">No dashboard owned. See <a href="#kpi">KPI Dashboard</a>.</div>'}</div>
+   <div class="panel"><h3>14–15 · Live workload and status now</h3><div class="mb small">${on==null?'':on?'<span class="tagx t-ok">On duty now</span>':'<span class="tagx t-grey">Not on duty now</span>'}</div>${live}</div></div>`;
+}
+
+/* =========================== KPI DASHBOARD =========================== */
+function pgKPI(){
+  const G=['all','BD','PM','Individual','Management']; const L=DASH.filter(x=>S.kGroup==='all'||x.g===S.kGroup);
+  const ownersOf=o=>o.map(x=>x==='tcs'?tcIds().map(chip).join(' '):P(x)?chip(x):esc(x)).join(' ');
+  const cards=L.map(x=>`<div class="panel"><div class="row">${x.g==='BD'?wfTag('BD'):x.g==='PM'?wfTag('PM'):`<span class="tagx t-grey">${esc(x.g)}</span>`}<h3>${esc(x.n)}</h3></div>
+    <p class="small"><b>Question:</b> ${esc(x.q)}</p>
+    <dl class="kv small"><dt>FSM fields</dt><dd>${x.f.map(esc).join(' · ')}</dd><dt>Formula</dt><dd><code style="white-space:normal">${esc(x.c)}</code></dd><dt>Refresh</dt><dd>${esc(x.r)}</dd><dt>Owner</dt><dd>${ownersOf(x.o)}</dd><dt>Threshold</dt><dd>${esc(x.t)}</dd><dt>Action</dt><dd>${esc(x.a)}</dd></dl></div>`).join('');
+  const kpiRows=[['BD first visit within T+1','≥ 90% of BD tickets','rakesh','jp','BD SC1 target (workbook)'],['BD follow-up within T+2','Target % to confirm (P1-1)','shakeel','jp','BD SC2 target'],['Billable cases closed within T+4','Target % to confirm','jp','anil','SC3 target — owner unnamed (P0-3)'],['Escalated / delayed calls reviewed daily','100% of Report 3 queue','anil','anil','BD gov 4, PM gov 3'],['PM plan vs completion','Target to confirm','pradeep','anil','PM Report 4'],['PM ticket closure verified','Target to confirm','pradeep','anil','PM 15–16'],['Repeat visits (same asset ≤ 30 days)','Target to confirm','anil','anil','Report 5'],['Cost per ticket / vendor payout','Target to confirm','anil','anil','Report 6'],['Attendance, uniform, timely reporting','100%','rakesh','jp','Report 10']];
+  return `<div class="phead"><div><h1>KPI dashboard catalogue</h1><p class="sub">${DASH.length} dashboard specifications for Zoho Analytics over FSM, Desk and Books. Each lists the business question, fields, formula, refresh, owner, threshold and the action expected when it trips.</p></div></div>
+  <div class="banner info mb">Build in Zoho Analytics — FSM workspace <b class="num">441267000002815063</b> (Assets view 441267000002852308), Desk workspace <b class="num">441267000000130002</b> (Tickets view 441267000000130021), Books workspace <b class="num">441267000000016002</b>. Fields marked “custom” on the <a href="#data">data model</a> page must exist first. Thresholds are assumptions unless the workbook states them.</div>
+  <div class="sechead"><h2>KPI → accountable owner</h2></div>
+  <div class="tblwrap"><table class="tbl"><tr><th>KPI</th><th>Target</th><th>Accountable</th><th>Escalation</th><th>Source</th></tr>${kpiRows.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td class="small">${esc(r[1])}</td><td>${chip(r[2])}</td><td>${chip(r[3])}</td><td class="small muted">${esc(r[4])}</td></tr>`).join('')}</table></div>
+  <div class="sechead"><h2>Dashboard specifications</h2><div class="row noprint">${G.map(g=>`<button class="pillbtn sm ${S.kGroup===g?'on':''}" onclick="S.kGroup='${g}';route()">${g==='all'?'All':g} <span class="muted">${g==='all'?DASH.length:DASH.filter(x=>x.g===g).length}</span></button>`).join('')}</div></div>
+  <div class="grid g2">${cards}</div>`;
+}
+
+/* =========================== DATA MODEL =========================== */
+function pgData(){
+  const st={C:['Custom field needed','t-p1'],S:['Standard in Desk / FSM / Books','t-ok'],X:['Outside FSM or to build','t-p0']};
+  const L=FIELDS.filter(f=>S.fStatus==='all'||f[2]===S.fStatus);
+  const map=[['BD 1–2','Desk Ticket: Open','CC logs ticket and slot'],['BD 3 / PM 3','FSM Request → Work Order: New','Request converted; W/O created'],['BD 4 / PM 4','Service Appointment: Scheduled','Slot assigned to technician / crew'],['BD 6','Service Appointment: Dispatched','Technician notified'],['BD 7A–7B','Trip started / ended','Travel tracked on FSM mobile app'],['BD 7C','Service Appointment: In Progress','Work started (timesheet)'],['BD 7D','Asset verified','MAC / serial scanned = device_id join key'],['BD 7E','Job sheet / service report','Signed by customer'],['BD 7F–7G','Service Appointment: Completed · return trip','Work done'],['BD 8','RCA (custom picklist)','Coordinator fills RCA'],['BD 9 / PM 15','Work Order: Completed','W/O closed'],['BD 10 / PM 16','Desk Ticket: Closed','Ticket closure'],['BD 11–13','W/O pending reason (custom) · child W/O','Follow-up / spare / FoC'],['BD 15','Estimate: Sent → Accepted / Declined','Quotation to customer'],['BD 14, 16','Invoice (Books) · ₹0 for FoC','Billing + warehouse'],['BD 23–24','Escalation flag (custom)','Customer disagrees → ASM'],['PM 1–4','Scheduled Maintenance plan → auto W/O + SA','Monthly PM plan']];
+  return `<div class="phead"><div><h1>Zoho FSM data model</h1><p class="sub">How each workflow step lands in Zoho Desk, FSM and Books, and which fields every KPI needs. Universal join key: <b>MAC address</b> = device_id = Serial Number = mac_id__C = DeviceID.</p></div></div>
+  <div class="panel"><h3>Data flow</h3><div class="row mt" style="gap:8px;flex-wrap:wrap">${['Zoho Desk — Ticket (CC)','FSM Request','FSM Work Order','Service Appointment + Trips + Timesheet','Asset (MAC)','Estimate / Invoice (Books)','Zoho Analytics dashboards'].map((x,i,a)=>`<span class="tagx ${i===0?'t-p2':i===a.length-1?'t-bd':i===5?'t-ok':'t-pm'}" style="font-size:13px;padding:6px 12px">${esc(x)}</span>${i<a.length-1?'<b class="muted">›</b>':''}`).join('')}</div>
+   <p class="small muted mt">Truth Engine (IoT telemetry) can join on MAC to flag failing units before a ticket is raised and to validate PM work — a Phase 4 item.</p></div>
+  <div class="sechead"><h2>Workflow stage → FSM status</h2><span class="note">Mapping proposed from standard Zoho FSM objects — confirm against CircoLife configuration</span></div>
+  <div class="tblwrap"><table class="tbl"><tr><th>Step</th><th>FSM object / status</th><th>Meaning</th></tr>${map.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td class="small">${esc(r[2])}</td></tr>`).join('')}</table></div>
+  <div class="sechead"><h2>Data dictionary</h2><div class="row noprint">${['all','S','C','X'].map(k=>`<button class="pillbtn sm ${S.fStatus===k?'on':''}" onclick="S.fStatus='${k}';route()">${k==='all'?'All':st[k][0]} <span class="muted">${k==='all'?FIELDS.length:FIELDS.filter(f=>f[2]===k).length}</span></button>`).join('')}</div></div>
+  <div class="tblwrap"><table class="tbl"><tr><th>Field</th><th>Source object</th><th>Status</th><th>Used for</th><th>Notes / IDs</th></tr>${L.map(f=>`<tr><td><b>${esc(f[0])}</b></td><td class="small">${esc(f[1])}</td><td><span class="tagx ${st[f[2]][1]}">${st[f[2]][0]}</span></td><td class="small">${esc(f[3])}</td><td class="tiny muted">${esc(f[4])}</td></tr>`).join('')}</table></div>
+  <div class="panel mt"><h3>Zoho Analytics workspaces</h3><div class="tblwrap mt"><table class="tbl"><tr><th>Workspace</th><th>Workspace ID</th><th>Key view</th></tr><tr><td>CircoDB</td><td class="num">441267000006399508</td><td class="num">441267000006399514</td></tr><tr><td>Zoho FSM</td><td class="num">441267000002815063</td><td class="num">Assets 441267000002852308</td></tr><tr><td>Zoho Desk</td><td class="num">441267000000130002</td><td class="num">Tickets 441267000000130021</td></tr><tr><td>Zoho Books</td><td class="num">441267000000016002</td><td class="num">Subscriptions 441267000000695420</td></tr></table></div></div>`;
+}
+
+/* =========================== RISKS / DECISIONS =========================== */
+function pgRisks(){
+  const grp=pr=>ISSUES.filter(i=>i.pr===pr).map(issueHTML).join('');
+  const V=S.vol;
+  const assumptions=[`Coverage window 08:00–20:00, 7 days`,`Shift A 08:00–17:00, Shift B 11:00–20:00, General 09:30–18:30 — each 9 h including a 1 h break`,`Handovers 11:00 (B joins) and 16:30–17:00 (A leaves)`,`${V.bd} BD tickets and ${V.pm} PM visits per day; ${V.fuPct}% BD follow-up, ${V.billPct}% billable, ${V.agreePct}% accepted`,`${V.techBD} BD technicians; ${V.pmTeams} PM vendor teams; ${V.bdVisitMin} / ${V.pmVisitMin} min per visit incl. travel`,`${V.meet} h/day huddles and handovers per coordinator`,`Backup carries 1/7 of the primary’s volume (weekly off cover)`,`Load thresholds: under < 85%, near 85–100%, over > 100%`,`T+n measured in calendar days from ticket creation`];
+  const phases=[['Phase 1 — Confirm (week 1–2)','Answer P0 questions; fix owners for step 23 and SC3; confirm shift times, CC and TC headcount; freeze roster v1.'],['Phase 2 — Configure FSM (week 2–5)','Create custom fields (pending reason, RCA picklist, escalation flag, parent W/O, coordinator owner, SLA due); set Scheduled Maintenance for PM; map Desk ↔ FSM statuses; enforce MAC on every W/O.'],['Phase 3 — Dashboards (week 4–8)','Build BD, PM, individual and management dashboards in Zoho Analytics; automate Reports 1–6 and 10; replace manual reports.'],['Phase 4 — Calibrate (month 2–3)','Use 4–8 weeks of FSM timesheets and ticket history to replace placeholder minutes and volumes; rebalance roster and headcount; link Truth Engine telemetry on MAC.'],['Phase 5 — Scale (month 3+)','Replicate the model to the other five cities; feed Subscriber 360 and B2B Dashboard 2.0; savings reports now, certified ESG reporting on the 2027 roadmap.']];
+  const cf=FIELDS.filter(f=>f[2]!=='S');
+  return `<div class="phead"><div><h1>Risks, decisions and open questions</h1><p class="sub">P0 must be answered before the roster and dashboards are finalised. P1 changes the design. P2 is clean-up.</p></div></div>
+  <div class="grid g3 mb"><div class="stat bad"><div class="v num">${ISSUES.filter(i=>i.pr==='p0').length}</div><div class="l">P0 — blocking</div></div><div class="stat warn"><div class="v num">${ISSUES.filter(i=>i.pr==='p1').length}</div><div class="l">P1 — design</div></div><div class="stat"><div class="v num">${ISSUES.filter(i=>i.pr==='p2').length}</div><div class="l">P2 — clean-up</div></div></div>
+  <div class="sechead"><h2>P0 — answer before finalising</h2></div>${grp('p0')}
+  <div class="sechead"><h2>P1 — design decisions</h2></div>${grp('p1')}
+  <div class="sechead"><h2>P2 — clean-up</h2></div>${grp('p2')}
+  <div class="two mt"><div class="panel"><h3>Assumptions in this draft</h3><ul class="clean small">${assumptions.map(a=>`<li>${esc(a)}</li>`).join('')}</ul><p class="tiny muted">Volumes and minutes are editable on <a href="#live">Live Workload</a>.</p></div>
+   <div class="panel"><h3>Roadmap</h3>${phases.map(p=>`<div class="phase"><b>${esc(p[0])}</b><div class="small">${esc(p[1])}</div></div>`).join('')}</div></div>
+  <div class="panel mt"><h3>FSM fields to create or source (${cf.length})</h3><ul class="clean small">${cf.map(f=>`<li><b>${esc(f[0])}</b> <span class="muted">— ${esc(f[1])} · ${esc(f[3])}</span></li>`).join('')}</ul><a class="pillbtn sm mt" href="#data">Full data dictionary</a></div>`;
+}
+
+/* =========================== SEARCH =========================== */
+function searchIndex(){ const I=[];
+  Object.entries(BD_STEPS).forEach(([k,s])=>I.push({k:'BD step '+k,t:s.act,x:(s.act+' '+s.fsm+' '+s.out+' '+(s.raw||'')).toLowerCase(),h:'bd/'+k}));
+  Object.entries(PM_STEPS).forEach(([k,s])=>I.push({k:'PM step '+k,t:s.act,x:(s.act+' '+(s.fsm||'')+' '+(s.out||'')+' '+(s.raw||'')).toLowerCase(),h:'pm/'+k}));
+  people().forEach(p=>I.push({k:'Person',t:p.name+' — '+p.role,x:(p.name+' '+(p.full||'')+' '+(p.alias||'')+' '+p.role+' '+(p.summary||'')).toLowerCase(),h:'person/'+p.id}));
+  DASH.forEach(d=>I.push({k:'Dashboard · '+d.g,t:d.n,x:(d.n+' '+d.q+' '+d.f.join(' ')).toLowerCase(),h:'kpi'}));
+  FIELDS.forEach(f=>I.push({k:'FSM field',t:f[0],x:(f.join(' ')).toLowerCase(),h:'data'}));
+  ISSUES.forEach(i=>I.push({k:i.id,t:i.t,x:(i.id+' '+i.t+' '+i.d+' '+(i.q||'')).toLowerCase(),h:'risks'}));
+  PAGES.forEach(p=>I.push({k:'Page',t:p[1],x:p[1].toLowerCase(),h:p[0]}));
+  return I; }
+(function(){ const q=$('#q'), r=$('#sres');
+  q.addEventListener('input',()=>{ const v=q.value.trim().toLowerCase(); if(v.length<2){ r.style.display='none'; return; }
+    const terms=v.split(/\s+/); const hits=searchIndex().filter(i=>terms.every(t=>i.x.includes(t)||i.t.toLowerCase().includes(t))).slice(0,14);
+    r.innerHTML=hits.length?hits.map(h=>`<a href="#${h.h}" onclick="document.getElementById('sres').style.display='none'"><div class="k">${esc(h.k)}</div>${esc(h.t)}</a>`).join(''):'<div class="small muted" style="padding:12px">No match</div>'; r.style.display='block'; });
+  q.addEventListener('keydown',e=>{ if(e.key==='Enter'){ const a=r.querySelector('a'); if(a){ location.hash=a.getAttribute('href'); r.style.display='none'; q.blur(); } } if(e.key==='Escape'){ r.style.display='none'; q.blur(); } });
+  document.addEventListener('click',e=>{ if(!e.target.closest('.search')) r.style.display='none'; });
+})();
+
+/* =========================== INIT =========================== */
+route();
+setInterval(()=>{ const pg=(location.hash||'#home').slice(1).split('/')[0]; if(['home','sh'].includes(pg)&&!document.querySelector('input:focus')) route(); else document.querySelectorAll('.clock').forEach(c=>c.textContent=hm(nowH())); },60000);
+</script>
+</body>
+</html>
